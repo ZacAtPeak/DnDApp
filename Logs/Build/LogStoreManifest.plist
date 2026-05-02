@@ -48,6 +48,48 @@
 			<key>uniqueIdentifier</key>
 			<string>35E92105-5DA0-4289-82DC-82402A85D56A</string>
 		</dict>
+		<key>EB7BE1B1-EC86-48CE-B33E-795B25B18F88</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>EB7BE1B1-EC86-48CE-B33E-795B25B18F88.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>DnDAppSwiftUI project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>DnDAppSwiftUI</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project DnDAppSwiftUI with scheme DnDAppSwiftUI and configuration Release</string>
+			<key>timeStartedRecording</key>
+			<real>799454020.26753902</real>
+			<key>timeStoppedRecording</key>
+			<real>799454041.06823206</real>
+			<key>title</key>
+			<string>Building project DnDAppSwiftUI with scheme DnDAppSwiftUI and configuration Release</string>
+			<key>uniqueIdentifier</key>
+			<string>EB7BE1B1-EC86-48CE-B33E-795B25B18F88</string>
+		</dict>
 	</dict>
 </dict>
 </plist>

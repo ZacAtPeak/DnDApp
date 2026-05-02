@@ -32,52 +32,92 @@ xcodebuild test -project DnDAppSwiftUI.xcodeproj -scheme DnDAppSwiftUITests -onl
 
 ## Architecture
 
-The main application source is in `DnDAppSwiftUI/`:
+The app follows MVVM with `@Observable` state management and a lightweight service layer.
 
-- **`DnDAppSwiftUI/DnDAppSwiftUIApp.swift`** — App entry point; sets the default window size.
-- **`DnDAppSwiftUI/ContentView.swift`** — Root view with `NavigationSplitView`, initiative tracker, and all detail views.
-- **`DnDAppSwiftUI/Models.swift`** — All data models, enums, protocols, and hardcoded demo data.
+### Directory Layout
 
-### Layout
-
-`ContentView` uses `NavigationSplitView` with a sidebar and a detail pane.
-
-**Sidebar** (`List` with recursive `children` via `SidebarItem`) contains:
-- Players (`person.2`) with children mapped from `testPlayers` (IDs: `player-<UUID>`)
-- NPCs (`person.3`) with nested groups:
-  - Monsters (IDs: `monster-<UUID>`)
-  - Characters (IDs: `character-<UUID>`)
-  - Other
-- Public Assets & Private Assets
-
-Sidebar items are draggable. Dragging a player, monster, or NPC into the initiative tracker creates a `Combatent` for that entity.
-
-**Detail Pane** always shows:
-1. **Initiative Tracker** — horizontal scroll of `InitiativeCard` views at the top. Supports drag-to-add from sidebar, drag-to-assign statuses, tap-to-select, and long-press/secondary-click to edit.
-2. **Selected Content** below the tracker:
-   - `InitiativeSelectionDetailView` when an initiative card is selected (delegates to player/monster/NPC detail views, or falls back to `CombatentDetailView`)
-   - `PlayerCharacterDetailView`, `MonsterDetailView`, or `NPCDetailView` when a sidebar item is selected
-   - Placeholder for non-entity sidebar items
-
-Toolbar buttons:
-- **Long Rest** — resets all combatants' and players' HP and clears statuses
-- **Statuses** — opens a `StatusPaletteView` popover to queue or drag statuses
-- **Add** menu — placeholder for adding characters, assets, or statuses
+```
+DnDAppSwiftUI/
+├── DnDAppSwiftUIApp.swift          # App entry point; window size
+├── ContentView.swift               # Thin shim → CampaignRootView
+├── Models/
+│   ├── GameMechanics/              # Shared enums & value types
+│   │   ├── AbilityScores.swift
+│   │   ├── Alignment.swift
+│   │   ├── Attack.swift
+│   │   ├── CreatureSize.swift
+│   │   ├── CreatureType.swift
+│   │   ├── DamageType.swift
+│   │   ├── LegendaryAction.swift
+│   │   ├── MovementSpeed.swift
+│   │   ├── SavingThrowProficiencies.swift
+│   │   ├── Senses.swift
+│   │   ├── SidebarItem.swift
+│   │   ├── SkillProficiency.swift
+│   │   ├── SpecialAbility.swift
+│   │   ├── SpellSlot.swift
+│   │   └── StatusCondition.swift
+│   └── Entities/                   # Concrete entity models
+│       ├── Combatent.swift
+│       ├── CombatParticipant.swift
+│       ├── Monster.swift
+│       ├── NPC.swift
+│       └── PlayerCharacter.swift
+├── Services/
+│   ├── CampaignDataService.swift   # Entity lookup, combatent factory, initiative rolls
+│   └── DemoData/                   # Hardcoded demo data (no persistence yet)
+│       ├── CombatentData.swift
+│       ├── MonsterData.swift
+│       ├── NPCData.swift
+│       ├── PlayerData.swift
+│       ├── SidebarData.swift
+│       └── StatusData.swift
+├── ViewModels/
+│   └── CampaignViewModel.swift     # @Observable root view model; all UI state & business logic
+└── Views/
+    ├── CampaignRootView.swift      # NavigationSplitView root
+    ├── CampaignDetailPane.swift    # Detail pane content switcher
+    ├── CampaignToolbar.swift       # ToolbarContent for Long Rest, Statuses, Add
+    ├── Common/                     # Reusable layout components (<100 lines each)
+    │   ├── AbilityScoreCell.swift
+    │   ├── AbilityScoresView.swift
+    │   ├── ActionsView.swift
+    │   ├── CreatureSummaryGrid.swift
+    │   ├── DescriptionRow.swift
+    │   ├── DetailHeader.swift
+    │   ├── DetailSection.swift
+    │   ├── LegendaryActionsView.swift
+    │   ├── SpecialAbilitiesView.swift
+    │   ├── SpellSlotsView.swift
+    │   ├── StatValueRow.swift
+    │   ├── StatusEditorRow.swift
+    │   ├── StatusesView.swift
+    │   └── SummaryMetric.swift
+    ├── Detail/                     # Full stat-block detail views
+    │   ├── CombatentDetailView.swift
+    │   ├── InitiativeSelectionDetailView.swift
+    │   ├── MonsterDetailView.swift
+    │   ├── NPCDetailView.swift
+    │   └── PlayerCharacterDetailView.swift
+    ├── Initiative/                 # Initiative tracker components
+    │   ├── InitiativeCard.swift
+    │   ├── InitiativeEditorView.swift
+    │   ├── InitiativeTrackerStrip.swift
+    │   └── StatusPaletteView.swift
+    └── Sidebar/
+        └── CampaignSidebar.swift   # Sidebar list with draggable items
+```
 
 ### State Management
 
-`ContentView` holds the following `@State`:
-- `selectedItemID: String?` — current sidebar selection
+`CampaignViewModel` (`@Observable`, `@MainActor`) is the single source of truth for the campaign screen. It owns:
+- `selectedItemID: String?` — sidebar selection
 - `combatents: [Combatent]` — live initiative tracker entries
-- `selectedInitiativeCombatentID: Combatent.ID?` — selected initiative card
-- `editingCombatentID: Combatent.ID?` — triggers the `InitiativeEditorView` sheet
-- `isStatusPalettePresented: Bool` — status palette popover visibility
-- `pendingStatus: StatusCondition?` — queued status awaiting assignment via card tap
+- `selectedInitiativeCombatentID: Combatent.ID?` — selected tracker card
+- `editingCombatentID: Combatent.ID?` — triggers editor sheet
+- `isStatusPalettePresented: Bool` & `pendingStatus: StatusCondition?` — status assignment flow
 
-Initiative cards support:
-- `dropDestination` for status drag payloads (prefix: `status:`)
-- `contextMenu` with Edit action
-- `onLongPressGesture` to open the editor
+Views observe the view model via `@Bindable` (for bindings) or plain property access (for reads). The view model delegates data lookups and combatent creation to `CampaignDataService`.
 
 ### Models
 
@@ -98,7 +138,7 @@ Entity types:
 
 `Combatent` is intentionally separate from the full entity types — it carries only the fields needed for the tracker strip. Note the existing misspelling (`Combatent` vs `Combatant`) — match it in new code to avoid compile errors.
 
-`CombatParticipant` protocol (`Identifiable` with `UUID`) abstracts the common fields across `PlayerCharacter`, `Monster`, and `NPC` (name, current/max HP, ability scores, status, spell slot count). It is used by `makeCombatent(from:)` and `rolledInitiative(for:)`.
+`CombatParticipant` protocol (`Identifiable` with `UUID`) abstracts the common fields across `PlayerCharacter`, `Monster`, and `NPC` (name, current/max HP, ability scores, status, spell slot count). It is used by `CampaignDataService.makeCombatent(from:)` and `rolledInitiative(for:)`.
 
 Core structs:
 - `AbilityScores` — STR/DEX/CON/INT/WIS/CHA with computed modifiers
@@ -111,25 +151,39 @@ Core structs:
 - `StatusCondition` — name, short effect, and longer description
 - `SidebarItem` — recursive tree node for sidebar navigation (`id`, `title`, `systemImage`, `children`)
 
-### Views (ContentView.swift)
+### Services
 
-Major view components (all in `ContentView.swift`):
-- `InitiativeCard` — card in the tracker strip showing name, initiative, HP, spell slots, and active statuses
-- `InitiativeEditorView` — sheet for editing a combatant's name, HP, initiative, turn state, spell slots, and statuses
-- `StatusPaletteView` — scrollable popover of assignable statuses, draggable onto initiative cards
-- `PlayerCharacterDetailView` / `MonsterDetailView` / `NPCDetailView` — full stat block layouts
-- `CombatentDetailView` — fallback detail for initiative-only combatants with no linked entity
-- `CreatureSummaryGrid` — reusable grid of AC, hit dice, initiative, speed, senses, languages
-- `AbilityScoresView` / `AbilityScoreCell` — six-score grid with modifiers
-- `StatusesView` — list of active status conditions with descriptions
-- `SpellSlotsView` — spell slot remaining or per-level breakdown
-- `SpecialAbilitiesView` / `ActionsView` / `LegendaryActionsView` — description rows
-- `DetailHeader` / `DetailSection` / `SummaryMetric` / `DescriptionRow` — layout primitives
-- `StatValueRow` / `StatusEditorRow` — form rows for the initiative editor
+`CampaignDataService` is a singleton (nonisolated) that provides:
+- Entity lookup by sidebar ID (`player(for:)`, `monster(for:)`, `npc(for:)`)
+- Recursive sidebar item search
+- Combatent factory (`makeCombatent(from:)`)
+- Initiative roll generation (`rolledInitiative(for:)`)
+
+All demo data lives in `Services/DemoData/` as global constants (`testMonsters`, `testNPCs`, `testPlayers`, `testCombatents`, `sidebarItems`, `defaultStatusConditions`). `testPlayers` is declared as `var` so `longRest()` can mutate HP and status. No persistence or networking exists yet.
+
+### Views
+
+**Root:** `CampaignRootView` sets up the `NavigationSplitView` with `CampaignSidebar` and the detail area. The detail area shows `InitiativeTrackerStrip` (always visible) above `CampaignDetailPane`.
+
+**Initiative Tracker:** `InitiativeTrackerStrip` is a horizontal scroll of `InitiativeCard` views. Supports:
+- Drag-to-add from sidebar (creates a `Combatent` via `CampaignDataService`)
+- Drag-to-assign statuses (payload prefix: `status:`)
+- Tap-to-select (or assign a queued status)
+- Long-press / secondary-click → `InitiativeEditorView` sheet
+
+**Detail Pane:** `CampaignDetailPane` switches between:
+- `InitiativeSelectionDetailView` (delegates to linked player/monster/NPC detail, or falls back to `CombatentDetailView`)
+- `PlayerCharacterDetailView` / `MonsterDetailView` / `NPCDetailView` for sidebar selections
+- Placeholder for non-entity sidebar items
+
+**Toolbar:** `CampaignToolbar` (`ToolbarContent`) provides:
+- **Long Rest** — resets all combatants' and players' HP and clears statuses
+- **Statuses** — opens `StatusPaletteView` popover to queue or drag statuses
+- **Add** menu — placeholder for adding characters, assets, or statuses
 
 ### Demo Data
 
-Global constants at the bottom of `Models.swift`:
+Global constants in `Services/DemoData/`:
 - `testMonsters: [Monster]` — 10 creatures (Goblin, Orc, Troll, Beholder, Adult Red Dragon, Gelatinous Cube, Mimic, Skeleton, Zombie, Owlbear)
 - `testNPCs: [NPC]` — 5 characters (Guard Captain, Merchant, Archmage, Mayor, Barkeep)
 - `testPlayers: [PlayerCharacter]` — 4 players (Wizard, Barbarian, Warlock, Paladin). Declared as `var` so `longRest()` can mutate HP/status.
