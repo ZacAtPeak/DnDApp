@@ -1,0 +1,31 @@
+{
+  "" : {
+    "const-values" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-primary.swiftconstvalues",
+    "dependencies" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-primary.d",
+    "diagnostics" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-primary.dia",
+    "emit-module-dependencies" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-primary-emit-module.dia",
+    "pch" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-primary.swiftdeps"
+  },
+  "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/GeneratedAssetSymbols.o"
+  },
+  "/Users/zacharyreyes/Documents/DnDAppSwiftUI/DnDAppSwiftUI/ContentView.swift" : {
+    "index-unit-output-path" : "/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/ContentView.o",
+    "llvm-bc" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/ContentView.bc",
+    "object" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/ContentView.o"
+  },
+  "/Users/zacharyreyes/Documents/DnDAppSwiftUI/DnDAppSwiftUI/DnDAppSwiftUIApp.swift" : {
+    "index-unit-output-path" : "/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUIApp.o",
+    "llvm-bc" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUIApp.bc",
+    "object" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUIApp.o"
+  },
+  "/Users/zacharyreyes/Documents/DnDAppSwiftUI/DnDAppSwiftUI/Models.swift" : {
+    "index-unit-output-path" : "/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/Models.o",
+    "llvm-bc" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/Models.bc",
+    "object" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/Models.o"
+  }
+}

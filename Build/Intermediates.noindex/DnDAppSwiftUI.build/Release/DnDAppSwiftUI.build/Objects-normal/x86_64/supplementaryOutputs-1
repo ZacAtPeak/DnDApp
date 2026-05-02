@@ -1,0 +1,12 @@
+{
+  "/Users/zacharyreyes/Documents/DnDAppSwiftUI/DnDAppSwiftUI/ContentView.swift" : {
+    "abi-baseline-json" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI.abi.json",
+    "const-values" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-primary.swiftconstvalues",
+    "dependencies" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-primary.d",
+    "diagnostics" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-primary.dia",
+    "objc-header" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI-Swift.h",
+    "swiftdoc" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI.swiftdoc",
+    "swiftmodule" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI.swiftmodule",
+    "swiftsourceinfo" : "/Users/zacharyreyes/Documents/DnDAppSwiftUI/Build/Intermediates.noindex/DnDAppSwiftUI.build/Release/DnDAppSwiftUI.build/Objects-normal/x86_64/DnDAppSwiftUI.swiftsourceinfo"
+  }
+}

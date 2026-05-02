@@ -133,7 +133,7 @@ struct SpellSlot {
     var level: Int
 }
 
-struct statusCondition {
+struct StatusCondition {
     var name: String
     var effect: String
     var desc: String
@@ -188,7 +188,7 @@ struct Monster: Identifiable {
 
     // Encounter State
     var initiative: Double = 0
-    var status: [statusCondition]?
+    var status: [StatusCondition]?
 }
 
 struct NPC: Identifiable {
@@ -233,7 +233,7 @@ struct NPC: Identifiable {
 
     // Encounter State
     var initiative: Double = 0
-    var status: [statusCondition]?
+    var status: [StatusCondition]?
 }
 
 struct PlayerCharacter: Identifiable {
@@ -281,7 +281,7 @@ struct PlayerCharacter: Identifiable {
     // Spells & Encounter State
     var spellSlots: [SpellSlot]
     var initiative: Double = 0
-    var status: [statusCondition]?
+    var status: [StatusCondition]?
 }
 
 struct Combatent: Identifiable {
@@ -291,8 +291,9 @@ struct Combatent: Identifiable {
     var maxHP: Int
     var initiative: Double
     var isTurn: Bool
-    var status: [statusCondition]?
+    var status: [StatusCondition]?
     var spellSlotCount: Int
+    var sourceSidebarID: String? = nil
 }
 
 struct SidebarItem: Identifiable, Hashable {
@@ -300,6 +301,29 @@ struct SidebarItem: Identifiable, Hashable {
     let title: String
     let systemImage: String
     var children: [SidebarItem]?
+}
+
+// MARK: - Combat Participant
+
+protocol CombatParticipant: Identifiable where ID == UUID {
+    var name: String { get }
+    var currentHP: Int { get }
+    var maxHP: Int { get }
+    var abilityScores: AbilityScores { get }
+    var status: [StatusCondition]? { get }
+    var spellSlotCount: Int { get }
+}
+
+extension Monster: CombatParticipant {
+    var spellSlotCount: Int { 0 }
+}
+
+extension NPC: CombatParticipant {
+    var spellSlotCount: Int { spellSlots.reduce(0) { $0 + $1.count } }
+}
+
+extension PlayerCharacter: CombatParticipant {
+    var spellSlotCount: Int { spellSlots.reduce(0) { $0 + $1.count } }
 }
 
 // MARK: - Demo Data
@@ -889,7 +913,7 @@ let testNPCs: [NPC] = [
     )
 ]
 
-let testPlayers: [PlayerCharacter] = [
+var testPlayers: [PlayerCharacter] = [
     // 1. Aelar — Elf Wizard 4
     PlayerCharacter(
         name: "Aelar",
@@ -934,7 +958,7 @@ let testPlayers: [PlayerCharacter] = [
         ],
         initiative: 12,
         status: [
-            statusCondition(name: "Hasted", effect: "Speed Doubled", desc: "Gain an additional action each turn")
+            StatusCondition(name: "Hasted", effect: "Speed Doubled", desc: "Gain an additional action each turn")
         ]
     ),
 
@@ -1030,7 +1054,7 @@ let testPlayers: [PlayerCharacter] = [
         ],
         initiative: 8,
         status: [
-            statusCondition(name: "Invisible", effect: "Unseen", desc: "Cannot be seen without special senses")
+            StatusCondition(name: "Invisible", effect: "Unseen", desc: "Cannot be seen without special senses")
         ]
     ),
 
@@ -1078,7 +1102,7 @@ let testPlayers: [PlayerCharacter] = [
         ],
         initiative: 10,
         status: [
-            statusCondition(name: "Inspired", effect: "1d8", desc: "Can add inspiration to a roll")
+            StatusCondition(name: "Inspired", effect: "1d8", desc: "Can add inspiration to a roll")
         ]
     )
 ]
@@ -1091,8 +1115,8 @@ let testCombatents: [Combatent] = [
         initiative: 18,
         isTurn: true,
         status: [
-            statusCondition(name: "Blessed", effect: "+1d4", desc: "Bonus to attack rolls and saving throws"),
-            statusCondition(name: "Poisoned", effect: "Disadvantage", desc: "Disadvantage on attack rolls and ability checks")
+            StatusCondition(name: "Blessed", effect: "+1d4", desc: "Bonus to attack rolls and saving throws"),
+            StatusCondition(name: "Poisoned", effect: "Disadvantage", desc: "Disadvantage on attack rolls and ability checks")
         ],
         spellSlotCount: 0
     ),
@@ -1103,7 +1127,7 @@ let testCombatents: [Combatent] = [
         initiative: 17,
         isTurn: false,
         status: [
-            statusCondition(name: "Concentrating", effect: "Spirit Guardians", desc: "Maintaining concentration on a spell")
+            StatusCondition(name: "Concentrating", effect: "Spirit Guardians", desc: "Maintaining concentration on a spell")
         ],
         spellSlotCount: 6
     ),
@@ -1132,7 +1156,7 @@ let testCombatents: [Combatent] = [
         initiative: 12,
         isTurn: false,
         status: [
-            statusCondition(name: "Restrained", effect: "Speed 0", desc: "Attack rolls against it have advantage")
+            StatusCondition(name: "Restrained", effect: "Speed 0", desc: "Attack rolls against it have advantage")
         ],
         spellSlotCount: 0
     ),
@@ -1152,7 +1176,7 @@ let testCombatents: [Combatent] = [
         initiative: 13,
         isTurn: false,
         status: [
-            statusCondition(name: "Frightened", effect: "Disadvantage", desc: "Cannot move closer to the source of fear")
+            StatusCondition(name: "Frightened", effect: "Disadvantage", desc: "Cannot move closer to the source of fear")
         ],
         spellSlotCount: 0
     )

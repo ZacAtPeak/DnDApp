@@ -1,0 +1,416 @@
+{
+  "source": "/Users/zacharyreyes/Documents/DnDAppSwiftUI/DnDAppSwiftUI/ContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Navigation",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 42
+        }
+      },
+      {
+        "comment": "",
+        "key": "Initiative Tracker",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "Drag characters here to add them to initiative",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 56
+        }
+      },
+      {
+        "comment": "",
+        "key": "Detail view content goes here.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
+        "key": "Character",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "Private Asset",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 131
+        }
+      },
+      {
+        "comment": "",
+        "key": "Public Asset",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 132
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@ %lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 331
+        }
+      },
+      {
+        "comment": "",
+        "key": "HP %lld/%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 335
+        }
+      },
+      {
+        "comment": "",
+        "key": "No active statuses",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 352
+        }
+      },
+      {
+        "comment": "",
+        "key": "No spell slots",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 385
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remaining",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 378
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 380
+        }
+      },
+      {
+        "comment": "",
+        "key": "Level %lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 390
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 392
+        }
+      },
+      {
+        "comment": "",
+        "key": "CR %g",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 436
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld XP",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 438
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld remaining",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 508
+        }
+      },
+      {
+        "comment": "",
+        "key": "No active statuses",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 651
+        }
+      },
+      {
+        "comment": "",
+        "key": "No spell slots",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 690
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remaining",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 683
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 685
+        }
+      },
+      {
+        "comment": "",
+        "key": "Level %lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 695
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 697
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 735
+        }
+      },
+      {
+        "comment": "",
+        "key": "No special abilities",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 759
+        }
+      },
+      {
+        "comment": "",
+        "key": "No actions",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 776
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld per round",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 797
+        }
+      },
+      {
+        "comment": "",
+        "key": "Long press or secondary-click to edit",
+        "location": {
+          "startingColumn": 15,
+          "startingLine": 892
+        }
+      },
+      {
+        "comment": "",
+        "key": "HP: %lld/%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 849
+        }
+      },
+      {
+        "comment": "",
+        "key": "Spell slots: %lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 853
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 844
+        }
+      },
+      {
+        "comment": "",
+        "key": "Statuses",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 860
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 888
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Initiative",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 970
+        }
+      },
+      {
+        "comment": "",
+        "key": "Combatant",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 918
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hit Points",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 932
+        }
+      },
+      {
+        "comment": "",
+        "key": "Spell Slots",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 942
+        }
+      },
+      {
+        "comment": "",
+        "key": "Statuses",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 948
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 919
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current Turn",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 921
+        }
+      },
+      {
+        "comment": "",
+        "key": "Initiative",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 924
+        }
+      },
+      {
+        "comment": "",
+        "key": "Initiative",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 926
+        }
+      },
+      {
+        "comment": "",
+        "key": "No active statuses",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 952
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Status",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 965
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 973
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 994
+        }
+      },
+      {
+        "comment": "",
+        "key": "Effect",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 1022
+        }
+      },
+      {
+        "comment": "",
+        "key": "Description",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 1024
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 1008
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove status",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 1019
+        }
+      }
+    ]
+  },
+  "version": 1
+}
