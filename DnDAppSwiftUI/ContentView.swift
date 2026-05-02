@@ -9,11 +9,14 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedItemID: String? = "players"
+    @State private var combatents: [Combatent] = testCombatents
+    @State private var isInitiativeTargeted = false
 
     var body: some View {
         NavigationSplitView {
             List(sidebarItems, children: \.children, selection: $selectedItemID) { item in
                 Label(item.title, systemImage: item.systemImage)
+                    .draggable(item.id)
             }
             .navigationTitle("Navigation")
         } detail: {
@@ -28,7 +31,7 @@ struct ContentView: View {
 
                         ScrollView(.horizontal) {
                             HStack(alignment: .top, spacing: 16) {
-                                ForEach(testCombatents) { combatent in
+                                ForEach(combatents) { combatent in
                                     InitiativeCard(combatent: combatent)
                                 }
                             }
@@ -37,6 +40,20 @@ struct ContentView: View {
                         }
                     }
                     .background(.bar)
+                    .overlay {
+                        if isInitiativeTargeted {
+                            Rectangle()
+                                .stroke(Color.accentColor, lineWidth: 2)
+                                .allowsHitTesting(false)
+                        }
+                    }
+                    .dropDestination(for: String.self) { ids, _ in
+                        let added = ids.compactMap { makeCombatent(from: $0) }
+                        combatents.append(contentsOf: added)
+                        return !added.isEmpty
+                    } isTargeted: { targeted in
+                        isInitiativeTargeted = targeted
+                    }
 
                     Divider()
 
@@ -96,6 +113,23 @@ struct ContentView: View {
             if let childMatch = findSidebarItem(withID: id, in: item.children ?? []) { return childMatch }
         }
 
+        return nil
+    }
+
+    private func makeCombatent(from sidebarID: String) -> Combatent? {
+        if sidebarID.hasPrefix("player-") {
+            let playerID = String(sidebarID.dropFirst("player-".count))
+            guard let player = testPlayers.first(where: { $0.id.uuidString == playerID }) else { return nil }
+            return Combatent(
+                name: player.name,
+                currentHP: player.currentHP,
+                maxHP: player.maxHP,
+                initiative: player.initiative,
+                isTurn: false,
+                status: player.status,
+                spellSlotCount: player.spellSlots.reduce(0) { $0 + $1.count }
+            )
+        }
         return nil
     }
 }
