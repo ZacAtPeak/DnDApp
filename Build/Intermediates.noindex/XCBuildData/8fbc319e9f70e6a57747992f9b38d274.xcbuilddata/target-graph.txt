@@ -1,2 +1,0 @@
-Target dependency graph (1 target)
-Target 'DnDAppSwiftUI' in project 'DnDAppSwiftUI' (no dependencies)
