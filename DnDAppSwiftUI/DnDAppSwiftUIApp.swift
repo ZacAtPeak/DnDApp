@@ -13,5 +13,6 @@ struct DnDAppSwiftUIApp: App {
         WindowGroup {
             ContentView()
         }
+        .defaultSize(width: 1250, height: 875)
     }
 }
