@@ -38,8 +38,8 @@ struct ContentView: View {
                                         .frame(minWidth: 300)
                                         .padding(.vertical, 8)
                                 } else {
-                                    ForEach(combatents) { combatent in
-                                        InitiativeCard(combatent: combatent)
+                                    ForEach($combatents) { $combatent in
+                                        InitiativeCard(combatent: $combatent)
                                     }
                                 }
                             }
@@ -251,7 +251,8 @@ struct DetailSection<Content: View>: View {
 }
 
 struct InitiativeCard: View {
-    var combatent: Combatent
+    @Binding var combatent: Combatent
+    @State private var isEditing = false
 
     private var activeStatuses: [statusCondition] {
         combatent.status ?? []
@@ -300,6 +301,75 @@ struct InitiativeCard: View {
                 .stroke(combatent.isTurn ? Color.orange : Color.secondary.opacity(0.2), lineWidth: combatent.isTurn ? 2 : 1)
         }
         .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+        .onLongPressGesture { isEditing = true }
+        .popover(isPresented: $isEditing) {
+            InitiativeCardEditView(combatent: $combatent)
+        }
+    }
+}
+
+struct InitiativeCardEditView: View {
+    @Binding var combatent: Combatent
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text(combatent.name)
+                .font(.title3)
+                .fontWeight(.bold)
+
+            GroupBox("Hit Points") {
+                VStack(spacing: 8) {
+                    Stepper(value: $combatent.currentHP, in: 0...999) {
+                        HStack {
+                            Text("Current")
+                            Spacer()
+                            Text("\(combatent.currentHP)")
+                                .fontWeight(.semibold)
+                                .monospacedDigit()
+                        }
+                    }
+                    Divider()
+                    Stepper(value: $combatent.maxHP, in: 1...999) {
+                        HStack {
+                            Text("Maximum")
+                            Spacer()
+                            Text("\(combatent.maxHP)")
+                                .fontWeight(.semibold)
+                                .monospacedDigit()
+                        }
+                    }
+                }
+            }
+
+            GroupBox("Initiative") {
+                Stepper(value: $combatent.initiative, in: -20...40) {
+                    HStack {
+                        Text("Roll")
+                        Spacer()
+                        Text("\(Int(combatent.initiative))")
+                            .fontWeight(.semibold)
+                            .monospacedDigit()
+                    }
+                }
+            }
+
+            GroupBox("Spell Slots") {
+                Stepper(value: $combatent.spellSlotCount, in: 0...30) {
+                    HStack {
+                        Text("Remaining")
+                        Spacer()
+                        Text("\(combatent.spellSlotCount)")
+                            .fontWeight(.semibold)
+                            .monospacedDigit()
+                    }
+                }
+            }
+
+            Toggle("Active Turn", isOn: $combatent.isTurn)
+                .toggleStyle(.switch)
+        }
+        .padding()
+        .frame(width: 280)
     }
 }
 
