@@ -1177,8 +1177,32 @@ let sidebarItems: [SidebarItem] = [
         title: "NPCs",
         systemImage: "person.3",
         children: [
-            SidebarItem(id: "npc-monsters", title: "Monsters", systemImage: "ant", children: nil),
-            SidebarItem(id: "npc-characters", title: "Characters", systemImage: "person.2", children: nil),
+            SidebarItem(
+                id: "npc-monsters",
+                title: "Monsters",
+                systemImage: "ant",
+                children: testMonsters.map { monster in
+                    SidebarItem(
+                        id: "monster-\(monster.id.uuidString)",
+                        title: monster.name,
+                        systemImage: "ant.fill",
+                        children: nil
+                    )
+                }
+            ),
+            SidebarItem(
+                id: "npc-characters",
+                title: "Characters",
+                systemImage: "person.2",
+                children: testNPCs.map { npc in
+                    SidebarItem(
+                        id: "character-\(npc.id.uuidString)",
+                        title: npc.name,
+                        systemImage: "person.fill",
+                        children: nil
+                    )
+                }
+            ),
             SidebarItem(id: "npc-other", title: "Other", systemImage: "square.grid.2x2", children: nil)
         ]
     ),

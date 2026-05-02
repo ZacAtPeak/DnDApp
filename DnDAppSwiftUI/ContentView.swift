@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedItemID: String? = "players"
-    @State private var combatents: [Combatent] = testCombatents
+    @State private var combatents: [Combatent] = []
     @State private var isInitiativeTargeted = false
 
     var body: some View {
@@ -31,8 +31,16 @@ struct ContentView: View {
 
                         ScrollView(.horizontal) {
                             HStack(alignment: .top, spacing: 16) {
-                                ForEach(combatents) { combatent in
-                                    InitiativeCard(combatent: combatent)
+                                if combatents.isEmpty {
+                                    Text("Drag characters here to add them to initiative")
+                                        .foregroundStyle(.secondary)
+                                        .font(.subheadline)
+                                        .frame(minWidth: 300)
+                                        .padding(.vertical, 8)
+                                } else {
+                                    ForEach(combatents) { combatent in
+                                        InitiativeCard(combatent: combatent)
+                                    }
                                 }
                             }
                             .padding(.horizontal)
@@ -118,8 +126,8 @@ struct ContentView: View {
 
     private func makeCombatent(from sidebarID: String) -> Combatent? {
         if sidebarID.hasPrefix("player-") {
-            let playerID = String(sidebarID.dropFirst("player-".count))
-            guard let player = testPlayers.first(where: { $0.id.uuidString == playerID }) else { return nil }
+            let rawID = String(sidebarID.dropFirst("player-".count))
+            guard let player = testPlayers.first(where: { $0.id.uuidString == rawID }) else { return nil }
             return Combatent(
                 name: player.name,
                 currentHP: player.currentHP,
@@ -128,6 +136,32 @@ struct ContentView: View {
                 isTurn: false,
                 status: player.status,
                 spellSlotCount: player.spellSlots.reduce(0) { $0 + $1.count }
+            )
+        }
+        if sidebarID.hasPrefix("monster-") {
+            let rawID = String(sidebarID.dropFirst("monster-".count))
+            guard let monster = testMonsters.first(where: { $0.id.uuidString == rawID }) else { return nil }
+            return Combatent(
+                name: monster.name,
+                currentHP: monster.currentHP,
+                maxHP: monster.maxHP,
+                initiative: monster.initiative,
+                isTurn: false,
+                status: monster.status,
+                spellSlotCount: 0
+            )
+        }
+        if sidebarID.hasPrefix("character-") {
+            let rawID = String(sidebarID.dropFirst("character-".count))
+            guard let npc = testNPCs.first(where: { $0.id.uuidString == rawID }) else { return nil }
+            return Combatent(
+                name: npc.name,
+                currentHP: npc.currentHP,
+                maxHP: npc.maxHP,
+                initiative: npc.initiative,
+                isTurn: false,
+                status: npc.status,
+                spellSlotCount: npc.spellSlots.reduce(0) { $0 + $1.count }
             )
         }
         return nil
