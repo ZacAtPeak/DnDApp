@@ -1,1 +1,5 @@
 Build/
+ModuleCache.noindex/
+SDKStatCaches.noindex/
+CompilationCache.noindex/
+
