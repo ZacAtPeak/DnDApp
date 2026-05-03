@@ -3,9 +3,22 @@ import SwiftUI
 struct NPCDetailView: View {
     let npc: NPC
     let encounterCombatent: Combatent?
+    var inventory: [InventoryItem] = []
+    var allLoot: [LootItem] = []
+    var onToggleEquip: ((UUID) -> Void)?
+    var onRollAbility: ((String, Int) -> Void)?
+    var onRollSkill: ((String, Int) -> Void)?
 
     private var activeStatuses: [StatusCondition] {
         encounterCombatent?.status ?? npc.status ?? []
+    }
+
+    private var equippedMods: EquippedModifiers {
+        allLoot.equippedModifiers(for: inventory)
+    }
+
+    private var effectiveScores: AbilityScores {
+        equippedMods.effectiveScores(base: npc.abilityScores)
     }
 
     var body: some View {
@@ -22,6 +35,7 @@ struct NPCDetailView: View {
             CreatureSummaryGrid(
                 armorClass: npc.armorClass,
                 armorSource: npc.armorSource,
+                acBonus: equippedMods.acBonus,
                 hitDice: npc.hitDice,
                 initiative: encounterCombatent?.initiative ?? npc.initiative,
                 speed: npc.speed,
@@ -31,9 +45,15 @@ struct NPCDetailView: View {
 
             StatusesView(statuses: activeStatuses)
             SpellSlotsView(slots: encounterCombatent?.spellSlots ?? npc.spellSlots)
-            AbilityScoresView(scores: npc.abilityScores)
+            AbilityScoresView(
+                scores: effectiveScores,
+                modifiedAbilities: equippedMods.modifiedAbilityKeys,
+                onRoll: onRollAbility
+            )
+            SkillsView(skills: npc.skills, onRoll: onRollSkill)
             SpecialAbilitiesView(abilities: npc.specialAbilities)
             ActionsView(actions: npc.actions)
+            InventorySection(inventory: inventory, allLoot: allLoot, onToggleEquip: onToggleEquip)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }

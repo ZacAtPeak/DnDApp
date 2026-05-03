@@ -53,15 +53,39 @@ final class CampaignDataService {
         return nil
     }
 
+    func makeCombatent(from sidebarID: String, initiative: Double) -> Combatent? {
+        if let p = player(for: sidebarID) {
+            return makeCombatent(from: p, sidebarID: sidebarID, initiative: initiative)
+        }
+        if let m = monster(for: sidebarID) {
+            return makeCombatent(from: m, sidebarID: sidebarID, initiative: initiative)
+        }
+        if let n = npc(for: sidebarID) {
+            return makeCombatent(from: n, sidebarID: sidebarID, initiative: initiative)
+        }
+        return nil
+    }
+
     // MARK: - Initiative
 
-    func rolledInitiative(for abilityScores: AbilityScores) -> Double {
+    func initiativeRoll(for abilityScores: AbilityScores) -> (roll: Int, modifier: Int, total: Double) {
         let roll = Int.random(in: 1...20)
-        let initiativeBonus = Int(floor(Double(abilityScores.dexterity - 10) / 2))
-        return Double(roll + initiativeBonus)
+        let modifier = Int(floor(Double(abilityScores.dexterity - 10) / 2))
+        return (roll, modifier, Double(roll + modifier))
+    }
+
+    func rolledInitiative(for abilityScores: AbilityScores) -> Double {
+        initiativeRoll(for: abilityScores).total
     }
 
     // MARK: - Helpers
+
+    func combatParticipant(for sidebarID: String) -> (any CombatParticipant)? {
+        if let p = player(for: sidebarID) { return p }
+        if let m = monster(for: sidebarID) { return m }
+        if let n = npc(for: sidebarID) { return n }
+        return nil
+    }
 
     private func entity<T: CombatParticipant>(for sidebarID: String?, prefix: String, in collection: [T]) -> T? {
         guard let sidebarID, sidebarID.hasPrefix(prefix + "-") else { return nil }
@@ -69,12 +93,12 @@ final class CampaignDataService {
         return collection.first { $0.id.uuidString == rawID }
     }
 
-    private func makeCombatent(from player: PlayerCharacter, sidebarID: String) -> Combatent {
+    private func makeCombatent(from player: PlayerCharacter, sidebarID: String, initiative: Double? = nil) -> Combatent {
         Combatent(
             name: player.name,
             currentHP: player.currentHP,
             maxHP: player.maxHP,
-            initiative: rolledInitiative(for: player.abilityScores),
+            initiative: initiative ?? rolledInitiative(for: player.abilityScores),
             isTurn: false,
             status: player.status,
             creatureType: player.race,
@@ -84,12 +108,12 @@ final class CampaignDataService {
         )
     }
 
-    private func makeCombatent(from monster: Monster, sidebarID: String) -> Combatent {
+    private func makeCombatent(from monster: Monster, sidebarID: String, initiative: Double? = nil) -> Combatent {
         Combatent(
             name: monster.name,
             currentHP: monster.currentHP,
             maxHP: monster.maxHP,
-            initiative: rolledInitiative(for: monster.abilityScores),
+            initiative: initiative ?? rolledInitiative(for: monster.abilityScores),
             isTurn: false,
             status: monster.status,
             creatureType: monster.type.rawValue,
@@ -99,12 +123,12 @@ final class CampaignDataService {
         )
     }
 
-    private func makeCombatent(from npc: NPC, sidebarID: String) -> Combatent {
+    private func makeCombatent(from npc: NPC, sidebarID: String, initiative: Double? = nil) -> Combatent {
         Combatent(
             name: npc.name,
             currentHP: npc.currentHP,
             maxHP: npc.maxHP,
-            initiative: rolledInitiative(for: npc.abilityScores),
+            initiative: initiative ?? rolledInitiative(for: npc.abilityScores),
             isTurn: false,
             status: npc.status,
             creatureType: "Humanoid",

@@ -26,50 +26,64 @@ struct CampaignRootView: View {
     }
 
     var body: some View {
-        NavigationSplitView {
-            CampaignSidebar(viewModel: viewModel)
-        } detail: {
-            NavigationStack {
-                VStack(alignment: .leading, spacing: 0) {
-                    InitiativeTrackerStrip(viewModel: viewModel)
-                        .frame(height: trackerHeight)
+        ZStack {
+            NavigationSplitView {
+                CampaignSidebar(viewModel: viewModel)
+            } detail: {
+                NavigationStack {
+                    VStack(alignment: .leading, spacing: 0) {
+                        InitiativeTrackerStrip(viewModel: viewModel)
+                            .frame(height: trackerHeight)
 
-                    resizeHandle
+                        resizeHandle
 
-                    CampaignDetailPane(viewModel: viewModel)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .transaction { transaction in
-                    if isResizingTracker {
-                        transaction.disablesAnimations = true
-                        transaction.animation = nil
+                        CampaignDetailPane(viewModel: viewModel)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .transaction { transaction in
+                        if isResizingTracker {
+                            transaction.disablesAnimations = true
+                            transaction.animation = nil
+                        }
+                    }
+                    .toolbar {
+                        CampaignToolbar(viewModel: viewModel)
+                    }
+                    .confirmationDialog(
+                        "Perform a Long Rest?",
+                        isPresented: $viewModel.isLongRestConfirmationPresented,
+                        titleVisibility: .visible
+                    ) {
+                        Button("Long Rest", role: .none) {
+                            viewModel.longRest()
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("This will restore all HP and spell slots for every combatant and player.")
+                    }
+                    .sheet(isPresented: isShowingCombatentEditor) {
+                        if let editingCombatent = viewModel.editingCombatent {
+                            InitiativeEditorView(combatent: editingCombatent)
+                        }
+                    }
+                    .sheet(isPresented: $viewModel.isCharacterCreationPresented) {
+                        CharacterCreationView { player in
+                            viewModel.createPlayerCharacter(player)
+                        }
+                    }
+                    .sheet(isPresented: $viewModel.isWikiEntryCreationPresented) {
+                        WikiEntryCreationView { entry in
+                            viewModel.createWikiEntry(entry)
+                        }
+                    }
+                    .inspector(isPresented: $viewModel.isRollHistoryPresented) {
+                        RollHistoryInspectorView(viewModel: viewModel)
                     }
                 }
-                .toolbar {
-                    CampaignToolbar(viewModel: viewModel)
-                }
-                .confirmationDialog(
-                    "Perform a Long Rest?",
-                    isPresented: $viewModel.isLongRestConfirmationPresented,
-                    titleVisibility: .visible
-                ) {
-                    Button("Long Rest", role: .none) {
-                        viewModel.longRest()
-                    }
-                    Button("Cancel", role: .cancel) {}
-                } message: {
-                    Text("This will restore all HP and spell slots for every combatant and player.")
-                }
-                .sheet(isPresented: isShowingCombatentEditor) {
-                    if let editingCombatent = viewModel.editingCombatent {
-                        InitiativeEditorView(combatent: editingCombatent)
-                    }
-                }
-                .sheet(isPresented: $viewModel.isCharacterCreationPresented) {
-                    CharacterCreationView { player in
-                        viewModel.createPlayerCharacter(player)
-                    }
-                }
+            }
+
+            if viewModel.isSearchPresented {
+                SearchOverlayView(viewModel: viewModel)
             }
         }
     }

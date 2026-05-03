@@ -18,11 +18,11 @@ var testPlayers: [PlayerCharacter] = [
         abilityScores: AbilityScores(strength: 8, dexterity: 14, constitution: 14, intelligence: 17, wisdom: 14, charisma: 10),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(intelligence: true, wisdom: true),
-        skills: [
-            SkillProficiency(skill: "Arcana", bonus: 5),
-            SkillProficiency(skill: "History", bonus: 5),
-            SkillProficiency(skill: "Perception", bonus: 4)
-        ],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 8, dexterity: 14, constitution: 14, intelligence: 17, wisdom: 14, charisma: 10),
+            proficiencyBonus: 2,
+            proficientNames: ["Arcana", "History", "Perception"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],
@@ -65,11 +65,11 @@ var testPlayers: [PlayerCharacter] = [
         abilityScores: AbilityScores(strength: 18, dexterity: 14, constitution: 16, intelligence: 8, wisdom: 12, charisma: 10),
         proficiencyBonus: 3,
         savingThrowProficiencies: SavingThrowProficiencies(strength: true, constitution: true),
-        skills: [
-            SkillProficiency(skill: "Athletics", bonus: 7),
-            SkillProficiency(skill: "Intimidation", bonus: 3),
-            SkillProficiency(skill: "Survival", bonus: 4)
-        ],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 18, dexterity: 14, constitution: 16, intelligence: 8, wisdom: 12, charisma: 10),
+            proficiencyBonus: 3,
+            proficientNames: ["Athletics", "Intimidation", "Survival"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],
@@ -109,12 +109,11 @@ var testPlayers: [PlayerCharacter] = [
         abilityScores: AbilityScores(strength: 8, dexterity: 16, constitution: 14, intelligence: 12, wisdom: 10, charisma: 18),
         proficiencyBonus: 3,
         savingThrowProficiencies: SavingThrowProficiencies(wisdom: true, charisma: true),
-        skills: [
-            SkillProficiency(skill: "Deception", bonus: 7),
-            SkillProficiency(skill: "Arcana", bonus: 4),
-            SkillProficiency(skill: "Insight", bonus: 3),
-            SkillProficiency(skill: "Persuasion", bonus: 7)
-        ],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 8, dexterity: 16, constitution: 14, intelligence: 12, wisdom: 10, charisma: 18),
+            proficiencyBonus: 3,
+            proficientNames: ["Deception", "Arcana", "Insight", "Persuasion"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],
@@ -159,11 +158,11 @@ var testPlayers: [PlayerCharacter] = [
         abilityScores: AbilityScores(strength: 16, dexterity: 10, constitution: 14, intelligence: 10, wisdom: 12, charisma: 14),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(wisdom: true, charisma: true),
-        skills: [
-            SkillProficiency(skill: "Athletics", bonus: 5),
-            SkillProficiency(skill: "Persuasion", bonus: 4),
-            SkillProficiency(skill: "Insight", bonus: 3)
-        ],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 16, dexterity: 10, constitution: 14, intelligence: 10, wisdom: 12, charisma: 14),
+            proficiencyBonus: 2,
+            proficientNames: ["Athletics", "Persuasion", "Insight"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],

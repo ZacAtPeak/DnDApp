@@ -6,6 +6,17 @@ struct SpellSlot {
     var available: Int
 }
 
+extension Int {
+    var romanNumeral: String {
+        let numerals = [(9,"IX"),(5,"V"),(4,"IV"),(1,"I")]
+        var n = self, result = ""
+        for (value, numeral) in numerals {
+            while n >= value { result += numeral; n -= value }
+        }
+        return result
+    }
+}
+
 extension Array where Element == SpellSlot {
     func normalizedToLevel9() -> [SpellSlot] {
         guard !isEmpty else { return [] }

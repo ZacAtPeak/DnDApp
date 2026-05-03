@@ -1,9 +1,13 @@
 import SwiftUI
 
-// MARK: - Environment Key
+// MARK: - Environment Keys
 
 private struct WikiEntriesKey: EnvironmentKey {
     static let defaultValue: [WikiEntry] = []
+}
+
+private struct WikiNavigationKey: EnvironmentKey {
+    static let defaultValue: ((WikiEntry) -> Void)? = nil
 }
 
 extension EnvironmentValues {
@@ -11,6 +15,19 @@ extension EnvironmentValues {
         get { self[WikiEntriesKey.self] }
         set { self[WikiEntriesKey.self] = newValue }
     }
+
+    var navigateToWikiEntry: ((WikiEntry) -> Void)? {
+        get { self[WikiNavigationKey.self] }
+        set { self[WikiNavigationKey.self] = newValue }
+    }
+}
+
+// MARK: - Token
+
+private struct TextToken: Identifiable {
+    let id = UUID()
+    let content: String
+    let wikiEntry: WikiEntry?
 }
 
 // MARK: - WikiLinkedText
@@ -19,58 +36,108 @@ struct WikiLinkedText: View {
     let text: String
 
     @Environment(\.wikiEntries) private var wikiEntries
-    @State private var presentedEntry: WikiEntry?
 
     var body: some View {
-        Text(makeAttributedString())
-            .environment(\.openURL, OpenURLAction { url in
-                guard url.scheme == "wiki",
-                      let id = url.host,
-                      let entry = wikiEntries.first(where: { $0.id == id })
-                else { return .systemAction }
-                presentedEntry = entry
-                return .handled
-            })
-            .popover(item: $presentedEntry) { entry in
-                WikiEntryPopover(entry: entry)
+        WikiTokenFlowLayout {
+            ForEach(tokens) { token in
+                if let entry = token.wikiEntry {
+                    WikiLinkToken(content: token.content, entry: entry)
+                } else {
+                    Text(token.content)
+                        .fixedSize()
+                }
             }
+        }
     }
 
-    private func makeAttributedString() -> AttributedString {
-        var result = AttributedString(text)
-        guard !wikiEntries.isEmpty else { return result }
+    private var tokens: [TextToken] {
+        tokenize(text: text, entries: wikiEntries)
+    }
 
-        // Sort descending by title length so longer matches (e.g. "Spell Slots") win over substrings (e.g. "Spell")
-        let sorted = wikiEntries.sorted { $0.title.count > $1.title.count }
+    private func tokenize(text: String, entries: [WikiEntry]) -> [TextToken] {
+        guard !entries.isEmpty else { return wordTokens(from: text) }
 
-        for entry in sorted {
-            guard let url = URL(string: "wiki://\(entry.id)") else { continue }
+        // Build a flat list of (term, entry) pairs from both titles and aliases,
+        // sorted longest-first so "Spell Slots" wins over a hypothetical shorter overlap.
+        let allTerms: [(term: String, entry: WikiEntry)] = entries
+            .flatMap { entry in ([entry.title] + entry.aliases).map { (term: $0, entry: entry) } }
+            .sorted { $0.term.count > $1.term.count }
+
+        var matches: [(range: Range<String.Index>, entry: WikiEntry)] = []
+        for (term, entry) in allTerms {
             var searchFrom = text.startIndex
-
             while searchFrom < text.endIndex {
                 guard let range = text.range(
-                    of: entry.title,
-                    options: [.caseInsensitive],
+                    of: term, options: .caseInsensitive,
                     range: searchFrom..<text.endIndex
                 ) else { break }
-
-                let prefixCount = text.distance(from: text.startIndex, to: range.lowerBound)
-                let matchCount = text.distance(from: range.lowerBound, to: range.upperBound)
-
-                let lo = result.characters.index(result.startIndex, offsetBy: prefixCount)
-                let hi = result.characters.index(lo, offsetBy: matchCount)
-
-                // Only link if this range isn't already linked by a longer match
-                let alreadyLinked = result[lo..<hi].runs.contains { $0.link != nil }
-                if !alreadyLinked {
-                    result[lo..<hi].link = url
+                if !matches.contains(where: { $0.range.overlaps(range) }) {
+                    matches.append((range, entry))
                 }
-
                 searchFrom = range.upperBound
             }
         }
+        matches.sort { $0.range.lowerBound < $1.range.lowerBound }
 
-        return result
+        var tokens: [TextToken] = []
+        var cursor = text.startIndex
+        for match in matches {
+            if cursor < match.range.lowerBound {
+                tokens += wordTokens(from: String(text[cursor..<match.range.lowerBound]))
+            }
+            tokens.append(TextToken(content: String(text[match.range]), wikiEntry: match.entry))
+            cursor = match.range.upperBound
+        }
+        if cursor < text.endIndex {
+            tokens += wordTokens(from: String(text[cursor...]))
+        }
+        return tokens
+    }
+
+    // Splits plain text into word-sized tokens so the flow layout can wrap at word boundaries.
+    private func wordTokens(from plainText: String) -> [TextToken] {
+        guard !plainText.isEmpty else { return [] }
+        var tokens: [TextToken] = []
+        var remaining = Substring(plainText)
+        while !remaining.isEmpty {
+            if let sep = remaining.firstIndex(where: { $0 == " " || $0 == "\n" }) {
+                let next = remaining.index(after: sep)
+                tokens.append(TextToken(content: String(remaining[..<next]), wikiEntry: nil))
+                remaining = remaining[next...]
+            } else {
+                tokens.append(TextToken(content: String(remaining), wikiEntry: nil))
+                break
+            }
+        }
+        return tokens
+    }
+}
+
+// MARK: - Wiki Link Token
+
+private struct WikiLinkToken: View {
+    let content: String
+    let entry: WikiEntry
+
+    @State private var isPresented = false
+    @Environment(\.navigateToWikiEntry) private var navigateToWikiEntry
+
+    var body: some View {
+        Text(content)
+            .underline()
+            .foregroundStyle(.tint)
+            .fixedSize()
+            // Double-tap is added first (inner) so SwiftUI tries it before the single-tap.
+            .onTapGesture(count: 2) {
+                isPresented = false
+                navigateToWikiEntry?(entry)
+            }
+            .onTapGesture(count: 1) {
+                isPresented = true
+            }
+            .popover(isPresented: $isPresented) {
+                WikiEntryPopover(entry: entry)
+            }
     }
 }
 
@@ -91,5 +158,57 @@ private struct WikiEntryPopover: View {
         }
         .padding()
         .frame(minWidth: 240, maxWidth: 360)
+    }
+}
+
+// MARK: - Flow Layout
+
+private struct WikiTokenFlowLayout: Layout {
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        arrange(in: proposal.replacingUnspecifiedDimensions().width, subviews: subviews).totalSize
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = arrange(in: bounds.width, subviews: subviews)
+        for (i, subview) in subviews.enumerated() {
+            subview.place(
+                at: CGPoint(x: bounds.minX + result.positions[i].x, y: bounds.minY + result.positions[i].y),
+                anchor: .topLeading,
+                proposal: .unspecified
+            )
+        }
+    }
+
+    private func arrange(in maxWidth: CGFloat, subviews: Subviews) -> (positions: [CGPoint], totalSize: CGSize) {
+        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
+        var positions = [CGPoint](repeating: .zero, count: sizes.count)
+
+        // Group indices into lines by wrapping at maxWidth
+        var lineRanges: [Range<Int>] = []
+        var lineStart = 0
+        var lineX: CGFloat = 0
+        for i in sizes.indices {
+            if lineX + sizes[i].width > maxWidth, lineStart < i {
+                lineRanges.append(lineStart..<i)
+                lineStart = i
+                lineX = 0
+            }
+            lineX += sizes[i].width
+        }
+        lineRanges.append(lineStart..<sizes.count)
+
+        // Assign positions row by row
+        var y: CGFloat = 0
+        for range in lineRanges {
+            let lineHeight = range.map { sizes[$0].height }.max() ?? 0
+            var x: CGFloat = 0
+            for i in range {
+                positions[i] = CGPoint(x: x, y: y)
+                x += sizes[i].width
+            }
+            y += lineHeight
+        }
+
+        return (positions, CGSize(width: maxWidth, height: y))
     }
 }

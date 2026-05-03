@@ -3,6 +3,11 @@ import SwiftUI
 struct PlayerCharacterDetailView: View {
     let player: PlayerCharacter
     let encounterCombatent: Combatent?
+    var inventory: [InventoryItem] = []
+    var allLoot: [LootItem] = []
+    var onToggleEquip: ((UUID) -> Void)?
+    var onRollAbility: ((String, Int) -> Void)?
+    var onRollSkill: ((String, Int) -> Void)?
 
     private var activeStatuses: [StatusCondition] {
         encounterCombatent?.status ?? player.status ?? []
@@ -14,6 +19,14 @@ struct PlayerCharacterDetailView: View {
 
     private var maxHP: Int {
         encounterCombatent?.maxHP ?? player.maxHP
+    }
+
+    private var equippedMods: EquippedModifiers {
+        allLoot.equippedModifiers(for: inventory)
+    }
+
+    private var effectiveScores: AbilityScores {
+        equippedMods.effectiveScores(base: player.abilityScores)
     }
 
     var body: some View {
@@ -35,6 +48,7 @@ struct PlayerCharacterDetailView: View {
             CreatureSummaryGrid(
                 armorClass: player.armorClass,
                 armorSource: player.armorSource,
+                acBonus: equippedMods.acBonus,
                 hitDice: player.hitDice,
                 initiative: encounterCombatent?.initiative ?? player.initiative,
                 speed: player.speed,
@@ -44,9 +58,15 @@ struct PlayerCharacterDetailView: View {
 
             StatusesView(statuses: activeStatuses)
             SpellSlotsView(slots: encounterCombatent?.spellSlots ?? player.spellSlots)
-            AbilityScoresView(scores: player.abilityScores)
+            AbilityScoresView(
+                scores: effectiveScores,
+                modifiedAbilities: equippedMods.modifiedAbilityKeys,
+                onRoll: onRollAbility
+            )
+            SkillsView(skills: player.skills, onRoll: onRollSkill)
             SpecialAbilitiesView(abilities: player.specialAbilities)
             ActionsView(actions: player.actions)
+            InventorySection(inventory: inventory, allLoot: allLoot, onToggleEquip: onToggleEquip)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }

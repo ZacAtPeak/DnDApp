@@ -24,7 +24,8 @@ var wikiDemoData: [WikiEntry] = [
     WikiEntry(
         id: "saving-throw",
         title: "Saving Throw",
-        description: "A saving throw represents an attempt to resist a spell, trap, poison, disease, or other harmful effect. Roll a d20 and add the relevant ability modifier plus your proficiency bonus (if proficient). The result must meet or beat the effect's difficulty class (DC) to succeed."
+        description: "A saving throw represents an attempt to resist a spell, trap, poison, disease, or other harmful effect. Roll a d20 and add the relevant ability modifier plus your proficiency bonus (if proficient). The result must meet or beat the effect's difficulty class (DC) to succeed.",
+        aliases: ["Saving Throws"]
     ),
     WikiEntry(
         id: "proficiency-bonus",
@@ -34,31 +35,37 @@ var wikiDemoData: [WikiEntry] = [
     WikiEntry(
         id: "spell-slots",
         title: "Spell Slots",
-        description: "Spell slots are the resource spellcasters expend to cast spells of 1st level and higher. Each slot has a level, and you can use a higher-level slot to cast a lower-level spell, often with enhanced effects. Most spell slots are recovered on a long rest, though Warlocks recover their slots on a short rest."
+        description: "Spell slots are the resource spellcasters expend to cast spells of 1st level and higher. Each slot has a level, and you can use a higher-level slot to cast a lower-level spell, often with enhanced effects. Most spell slots are recovered on a long rest, though Warlocks recover their slots on a short rest.",
+        aliases: ["Spell Slot"]
     ),
     WikiEntry(
         id: "resistance",
         title: "Resistance",
-        description: "A creature with resistance to a damage type takes only half damage from sources of that type. Resistance is applied after all other modifiers. Having resistance from multiple sources does not further reduce the damage — it still only halves it once."
+        description: "A creature with resistance to a damage type takes only half damage from sources of that type. Resistance is applied after all other modifiers. Having resistance from multiple sources does not further reduce the damage — it still only halves it once.",
+        aliases: ["Resistances"]
     ),
     WikiEntry(
         id: "vulnerability",
         title: "Vulnerability",
-        description: "A creature with vulnerability to a damage type takes double damage from sources of that type. This doubling is applied after all other modifiers. If a creature has both resistance and vulnerability to the same damage type, they cancel out and normal damage is taken."
+        description: "A creature with vulnerability to a damage type takes double damage from sources of that type. This doubling is applied after all other modifiers. If a creature has both resistance and vulnerability to the same damage type, they cancel out and normal damage is taken.",
+        aliases: ["Vulnerabilities"]
     ),
     WikiEntry(
         id: "bonus-action",
         title: "Bonus Action",
-        description: "A bonus action is a special action available through certain class features, spells, or other abilities. You can take one bonus action on your turn; if you have nothing that grants a bonus action, you cannot use one. Unlike actions, bonus actions are only available when a specific feature says so."
+        description: "A bonus action is a special action available through certain class features, spells, or other abilities. You can take one bonus action on your turn; if you have nothing that grants a bonus action, you cannot use one. Unlike actions, bonus actions are only available when a specific feature says so.",
+        aliases: ["Bonus Actions"]
     ),
     WikiEntry(
         id: "reaction",
         title: "Reaction",
-        description: "A reaction is an instant response to a trigger of some kind, which can occur on your turn or on another creature's turn. You can take only one reaction per round, and it recharges at the start of your next turn. The most common reaction is the opportunity attack."
+        description: "A reaction is an instant response to a trigger of some kind, which can occur on your turn or on another creature's turn. You can take only one reaction per round, and it recharges at the start of your next turn. The most common reaction is the opportunity attack.",
+        aliases: ["Reactions"]
     ),
     WikiEntry(
         id: "opportunity-attack",
         title: "Opportunity Attack",
-        description: "When a hostile creature moves out of your reach without using the Disengage action, you can use your reaction to make one melee attack against it. The attack uses your normal attack action, including extra attacks from Extra Attack. Flying creatures that land provoke opportunity attacks as normal."
+        description: "When a hostile creature moves out of your reach without using the Disengage action, you can use your reaction to make one melee attack against it. The attack uses your normal attack action, including extra attacks from Extra Attack. Flying creatures that land provoke opportunity attacks as normal.",
+        aliases: ["Opportunity Attacks"]
     )
 ]

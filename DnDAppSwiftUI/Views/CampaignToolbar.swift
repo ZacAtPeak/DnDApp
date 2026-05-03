@@ -32,6 +32,9 @@ struct CampaignToolbar: ToolbarContent {
                 Button("Character") {
                     viewModel.isCharacterCreationPresented = true
                 }
+                Button("Wiki Entry") {
+                    viewModel.isWikiEntryCreationPresented = true
+                }
                 Button("Private Asset") {}
                 Button("Public Asset") {}
                 Button("Statuses") {
@@ -40,6 +43,27 @@ struct CampaignToolbar: ToolbarContent {
             } label: {
                 Image(systemName: "plus")
             }
+        }
+
+        ToolbarItem {
+            Button {
+                viewModel.isRollHistoryPresented.toggle()
+            } label: {
+                Label("Roll History", systemImage: "dice")
+            }
+            .help("Show roll history")
+        }
+
+        ToolbarItem(placement: .primaryAction) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    viewModel.isSearchPresented = true
+                }
+            } label: {
+                Label("Search", systemImage: "magnifyingglass")
+            }
+            .help("Search across all content")
+            .keyboardShortcut("f", modifiers: .command)
         }
     }
 }

@@ -16,11 +16,11 @@ let testNPCs: [NPC] = [
         abilityScores: AbilityScores(strength: 16, dexterity: 12, constitution: 14, intelligence: 10, wisdom: 14, charisma: 14),
         proficiencyBonus: 3,
         savingThrowProficiencies: SavingThrowProficiencies(strength: true, constitution: true),
-        skills: [
-            SkillProficiency(skill: "Athletics", bonus: 6),
-            SkillProficiency(skill: "Perception", bonus: 5),
-            SkillProficiency(skill: "Intimidation", bonus: 5)
-        ],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 16, dexterity: 12, constitution: 14, intelligence: 10, wisdom: 14, charisma: 14),
+            proficiencyBonus: 3,
+            proficientNames: ["Athletics", "Perception", "Intimidation"]
+        ),
         damageResistances: [],
         damageImmunities: [],
         conditionImmunities: [],
@@ -53,12 +53,11 @@ let testNPCs: [NPC] = [
         abilityScores: AbilityScores(strength: 8, dexterity: 16, constitution: 10, intelligence: 14, wisdom: 12, charisma: 16),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(dexterity: true),
-        skills: [
-            SkillProficiency(skill: "Deception", bonus: 5),
-            SkillProficiency(skill: "Stealth", bonus: 7),
-            SkillProficiency(skill: "Insight", bonus: 3),
-            SkillProficiency(skill: "Sleight of Hand", bonus: 7)
-        ],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 8, dexterity: 16, constitution: 10, intelligence: 14, wisdom: 12, charisma: 16),
+            proficiencyBonus: 2,
+            proficientNames: ["Deception", "Stealth", "Insight", "Sleight of Hand"]
+        ),
         damageResistances: [],
         damageImmunities: [],
         conditionImmunities: [],
@@ -91,11 +90,11 @@ let testNPCs: [NPC] = [
         abilityScores: AbilityScores(strength: 6, dexterity: 12, constitution: 12, intelligence: 20, wisdom: 16, charisma: 14),
         proficiencyBonus: 4,
         savingThrowProficiencies: SavingThrowProficiencies(intelligence: true, wisdom: true),
-        skills: [
-            SkillProficiency(skill: "Arcana", bonus: 13),
-            SkillProficiency(skill: "History", bonus: 9),
-            SkillProficiency(skill: "Insight", bonus: 7)
-        ],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 6, dexterity: 12, constitution: 12, intelligence: 20, wisdom: 16, charisma: 14),
+            proficiencyBonus: 4,
+            proficientNames: ["Arcana", "History", "Insight"]
+        ),
         damageResistances: [],
         damageImmunities: [],
         conditionImmunities: [],
@@ -134,11 +133,11 @@ let testNPCs: [NPC] = [
         abilityScores: AbilityScores(strength: 8, dexterity: 12, constitution: 12, intelligence: 11, wisdom: 10, charisma: 18),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(charisma: true),
-        skills: [
-            SkillProficiency(skill: "Persuasion", bonus: 6),
-            SkillProficiency(skill: "Insight", bonus: 4),
-            SkillProficiency(skill: "History", bonus: 2)
-        ],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 8, dexterity: 12, constitution: 12, intelligence: 11, wisdom: 10, charisma: 18),
+            proficiencyBonus: 2,
+            proficientNames: ["Persuasion", "Insight", "History"]
+        ),
         damageResistances: [],
         damageImmunities: [],
         conditionImmunities: [],
@@ -170,11 +169,11 @@ let testNPCs: [NPC] = [
         abilityScores: AbilityScores(strength: 16, dexterity: 14, constitution: 14, intelligence: 10, wisdom: 14, charisma: 15),
         proficiencyBonus: 3,
         savingThrowProficiencies: SavingThrowProficiencies(strength: true, dexterity: true),
-        skills: [
-            SkillProficiency(skill: "Athletics", bonus: 6),
-            SkillProficiency(skill: "Perception", bonus: 5),
-            SkillProficiency(skill: "Survival", bonus: 5)
-        ],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 16, dexterity: 14, constitution: 14, intelligence: 10, wisdom: 14, charisma: 15),
+            proficiencyBonus: 3,
+            proficientNames: ["Athletics", "Perception", "Survival"]
+        ),
         damageResistances: [.bludgeoning, .piercing, .slashing],
         damageImmunities: [],
         conditionImmunities: [],

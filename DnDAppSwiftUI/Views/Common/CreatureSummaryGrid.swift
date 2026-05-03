@@ -3,6 +3,7 @@ import SwiftUI
 struct CreatureSummaryGrid: View {
     let armorClass: Int
     let armorSource: String
+    var acBonus: Int = 0
     let hitDice: String
     let initiative: Double
     let speed: MovementSpeed
@@ -15,7 +16,12 @@ struct CreatureSummaryGrid: View {
 
     var body: some View {
         LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
-            SummaryMetric(title: "Armor Class", value: "\(armorClass) \(armorSource)")
+            SummaryMetric(
+                title: "Armor Class",
+                value: acBonus > 0
+                    ? "\(armorClass + acBonus) \(armorSource) (+\(acBonus) eq.)"
+                    : "\(armorClass) \(armorSource)"
+            )
             SummaryMetric(title: "Hit Dice", value: hitDice)
             SummaryMetric(title: "Initiative", value: "\(Int(initiative))")
             SummaryMetric(title: "Speed", value: speedText)

@@ -1,11 +1,26 @@
 import SwiftUI
 import Observation
 
+enum InventoryEntityType { case player, monster, npc }
+
+struct SearchResult: Identifiable {
+    let id: String
+    let title: String
+    let subtitle: String
+    let systemImage: String
+    let sidebarID: String
+}
+
 @Observable
 @MainActor
 final class CampaignViewModel {
     var selectedItemID: String? = "players"
     var wikiEntries: [WikiEntry] = wikiDemoData
+    var lootItems: [LootItem] = lootDemoData
+    var spellEntries: [SpellEntry] = spellDemoData
+    var playerInventories: [UUID: [InventoryItem]] = [:]
+    var monsterInventories: [UUID: [InventoryItem]] = [:]
+    var npcInventories: [UUID: [InventoryItem]] = [:]
     var combatents: [Combatent] = []
     var selectedInitiativeCombatentID: Combatent.ID?
     var isInitiativeTargeted = false
@@ -13,12 +28,59 @@ final class CampaignViewModel {
     var isStatusPalettePresented = false
     var isLongRestConfirmationPresented = false
     var isCharacterCreationPresented = false
+    var isWikiEntryCreationPresented = false
+    var isSearchPresented = false
+    var searchQuery = ""
+    var isRollHistoryPresented = false
+    var rollHistory: [RollEntry] = []
     var pendingStatus: StatusCondition?
 
     private let dataService: CampaignDataService
 
     init(dataService: CampaignDataService) {
         self.dataService = dataService
+        // Wizard (index 0): ring of protection equipped, bag of holding in pack
+        if testPlayers.count > 0 {
+            playerInventories[testPlayers[0].id] = [
+                InventoryItem(lootItemID: "ring-of-protection", isEquipped: true),
+                InventoryItem(lootItemID: "bag-of-holding")
+            ]
+        }
+        // Barbarian (index 1): gauntlets equipped, potion in pack
+        if testPlayers.count > 1 {
+            playerInventories[testPlayers[1].id] = [
+                InventoryItem(lootItemID: "gauntlets-of-ogre-power", isEquipped: true),
+                InventoryItem(lootItemID: "potion-of-healing")
+            ]
+        }
+        // Warlock (index 2): cloak and staff in pack
+        if testPlayers.count > 2 {
+            playerInventories[testPlayers[2].id] = [
+                InventoryItem(lootItemID: "cloak-of-elvenkind"),
+                InventoryItem(lootItemID: "staff-of-the-python")
+            ]
+        }
+        // Paladin (index 3): dwarven thrower equipped, amulet of health equipped
+        if testPlayers.count > 3 {
+            playerInventories[testPlayers[3].id] = [
+                InventoryItem(lootItemID: "dwarven-thrower", isEquipped: true),
+                InventoryItem(lootItemID: "amulet-of-health", isEquipped: true)
+            ]
+        }
+        // Guard Captain NPC (index 0): sword of vengeance equipped
+        if testNPCs.count > 0 {
+            npcInventories[testNPCs[0].id] = [
+                InventoryItem(lootItemID: "sword-of-vengeance", isEquipped: true),
+                InventoryItem(lootItemID: "ring-of-protection")
+            ]
+        }
+        // Archmage NPC (index 2): staff equipped, deck of illusions in pack
+        if testNPCs.count > 2 {
+            npcInventories[testNPCs[2].id] = [
+                InventoryItem(lootItemID: "staff-of-the-python", isEquipped: true),
+                InventoryItem(lootItemID: "deck-of-illusions")
+            ]
+        }
     }
 
     // MARK: - Computed
@@ -101,14 +163,40 @@ final class CampaignViewModel {
                 id: "wiki",
                 title: "Wiki",
                 systemImage: "book.pages",
-                children: wikiEntries.map { entry in
+                children: [
                     SidebarItem(
-                        id: "wiki-\(entry.id)",
-                        title: entry.title,
+                        id: "wiki-entries",
+                        title: "Entries",
                         systemImage: "doc.text",
-                        children: nil
+                        children: wikiEntries.map { entry in
+                            SidebarItem(
+                                id: "wiki-\(entry.id)",
+                                title: entry.title,
+                                systemImage: "doc.text",
+                                children: nil
+                            )
+                        }
+                    ),
+                    SidebarItem(
+                        id: "wiki-loot",
+                        title: "Loot",
+                        systemImage: "backpack",
+                        children: lootItems.map { item in
+                            SidebarItem(
+                                id: "loot-\(item.id)",
+                                title: item.name,
+                                systemImage: "diamond",
+                                children: nil
+                            )
+                        }
+                    ),
+                    SidebarItem(
+                        id: "wiki-spells",
+                        title: "Spells",
+                        systemImage: "sparkles",
+                        children: spellSidebarGroups()
                     )
-                }
+                ]
             )
         ]
     }
@@ -130,7 +218,133 @@ final class CampaignViewModel {
     }
 
     var selectedWikiEntry: WikiEntry? {
-        dataService.wikiEntry(for: selectedItemID)
+        guard let id = selectedItemID, id.hasPrefix("wiki-") else { return nil }
+        return wikiEntries.first { $0.id == String(id.dropFirst(5)) }
+    }
+
+    var selectedLootItem: LootItem? {
+        guard let id = selectedItemID, id.hasPrefix("loot-") else { return nil }
+        return lootItems.first { $0.id == String(id.dropFirst(5)) }
+    }
+
+    var selectedSpellEntry: SpellEntry? {
+        guard let id = selectedItemID, id.hasPrefix("spell-") else { return nil }
+        return spellEntries.first { $0.id == String(id.dropFirst(6)) }
+    }
+
+    var selectedPlayerInventory: [InventoryItem] {
+        guard let id = selectedPlayer?.id else { return [] }
+        return playerInventories[id] ?? []
+    }
+
+    var selectedMonsterInventory: [InventoryItem] {
+        guard let id = selectedMonster?.id else { return [] }
+        return monsterInventories[id] ?? []
+    }
+
+    var selectedNPCInventory: [InventoryItem] {
+        guard let id = selectedNPC?.id else { return [] }
+        return npcInventories[id] ?? []
+    }
+
+    func equippedModifiers(for entityID: UUID, entityType: InventoryEntityType) -> EquippedModifiers {
+        let inv: [InventoryItem]
+        switch entityType {
+        case .player:  inv = playerInventories[entityID] ?? []
+        case .monster: inv = monsterInventories[entityID] ?? []
+        case .npc:     inv = npcInventories[entityID] ?? []
+        }
+        return lootItems.equippedModifiers(for: inv)
+    }
+
+    func toggleEquip(inventoryItemID: UUID, forEntity entityID: UUID, entityType: InventoryEntityType) {
+        switch entityType {
+        case .player:
+            guard let idx = playerInventories[entityID]?.firstIndex(where: { $0.id == inventoryItemID }) else { return }
+            playerInventories[entityID]![idx].isEquipped.toggle()
+        case .monster:
+            guard let idx = monsterInventories[entityID]?.firstIndex(where: { $0.id == inventoryItemID }) else { return }
+            monsterInventories[entityID]![idx].isEquipped.toggle()
+        case .npc:
+            guard let idx = npcInventories[entityID]?.firstIndex(where: { $0.id == inventoryItemID }) else { return }
+            npcInventories[entityID]![idx].isEquipped.toggle()
+        }
+    }
+
+    var searchResults: [SearchResult] {
+        let query = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard query.count >= 1 else { return [] }
+
+        var results: [SearchResult] = []
+
+        for monster in testMonsters {
+            if monster.name.lowercased().contains(query) || monster.type.rawValue.lowercased().contains(query) {
+                results.append(SearchResult(
+                    id: "monster-\(monster.id.uuidString)",
+                    title: monster.name,
+                    subtitle: "\(monster.type.rawValue) • CR \(monster.challengeRating)",
+                    systemImage: "ant.fill",
+                    sidebarID: "monster-\(monster.id.uuidString)"
+                ))
+            }
+        }
+
+        for npc in testNPCs {
+            if npc.name.lowercased().contains(query) || npc.role.lowercased().contains(query) {
+                results.append(SearchResult(
+                    id: "character-\(npc.id.uuidString)",
+                    title: npc.name,
+                    subtitle: npc.role,
+                    systemImage: "person.fill",
+                    sidebarID: "character-\(npc.id.uuidString)"
+                ))
+            }
+        }
+
+        for player in testPlayers {
+            if player.name.lowercased().contains(query) || player.race.lowercased().contains(query) || player.playerClass.lowercased().contains(query) {
+                results.append(SearchResult(
+                    id: "player-\(player.id.uuidString)",
+                    title: player.name,
+                    subtitle: "\(player.race) \(player.playerClass) • Level \(player.level)",
+                    systemImage: "person",
+                    sidebarID: "player-\(player.id.uuidString)"
+                ))
+            }
+        }
+
+        for entry in wikiEntries {
+            let matchesTitle = entry.title.lowercased().contains(query)
+            let matchesDesc = entry.description.lowercased().contains(query)
+            let matchesAlias = entry.aliases.contains { $0.lowercased().contains(query) }
+            if matchesTitle || matchesDesc || matchesAlias {
+                results.append(SearchResult(
+                    id: "wiki-\(entry.id)",
+                    title: entry.title,
+                    subtitle: "Wiki",
+                    systemImage: "doc.text",
+                    sidebarID: "wiki-\(entry.id)"
+                ))
+            }
+        }
+
+        for item in lootItems {
+            let matchesName = item.name.lowercased().contains(query)
+            let matchesType = item.type.lowercased().contains(query)
+            let matchesRarity = item.rarity.lowercased().contains(query)
+            let matchesDesc = item.description.lowercased().contains(query)
+            if matchesName || matchesType || matchesRarity || matchesDesc {
+                results.append(SearchResult(
+                    id: "loot-\(item.id)",
+                    title: item.name,
+                    subtitle: "\(item.type) • \(item.rarity)",
+                    systemImage: "diamond",
+                    sidebarID: "loot-\(item.id)"
+                ))
+            }
+        }
+
+        return results
     }
 
     var editingCombatent: Binding<Combatent>? {
@@ -168,13 +382,53 @@ final class CampaignViewModel {
                 let existsInAdded = added.contains { $0.sourceSidebarID == id }
                 if existsInTracker || existsInAdded { continue }
             }
-            if let newCombatent = dataService.makeCombatent(from: id) {
+            let initiative: Double
+            if let participant = dataService.combatParticipant(for: id) {
+                let details = dataService.initiativeRoll(for: participant.abilityScores)
+                logRoll(
+                    type: "Initiative",
+                    name: participant.name,
+                    roll: details.roll,
+                    modifier: details.modifier,
+                    total: details.total
+                )
+                initiative = details.total
+            } else {
+                initiative = 0
+            }
+            if let newCombatent = dataService.makeCombatent(from: id, initiative: initiative) {
                 added.append(newCombatent)
             }
         }
         combatents.append(contentsOf: added)
         combatents.sort { $0.initiative > $1.initiative }
         return !added.isEmpty
+    }
+
+    func logRoll(type: String, name: String, roll: Int, modifier: Int, total: Double) {
+        let entry = RollEntry(
+            type: type,
+            name: name,
+            roll: roll,
+            modifier: modifier,
+            total: total,
+            timestamp: Date()
+        )
+        rollHistory.insert(entry, at: 0)
+    }
+
+    func clearRollHistory() {
+        rollHistory.removeAll()
+    }
+
+    func rollAbilityCheck(name: String, modifier: Int) {
+        let roll = Int.random(in: 1...20)
+        logRoll(type: "Ability", name: name, roll: roll, modifier: modifier, total: Double(roll + modifier))
+    }
+
+    func rollSkillCheck(name: String, bonus: Int) {
+        let roll = Int.random(in: 1...20)
+        logRoll(type: "Skill", name: name, roll: roll, modifier: bonus, total: Double(roll + bonus))
     }
 
     func selectOrAssignStatus(to combatent: Combatent) {
@@ -284,7 +538,35 @@ final class CampaignViewModel {
         selectedItemID = "player-\(player.id.uuidString)"
     }
 
+    func createWikiEntry(_ entry: WikiEntry) {
+        var id = entry.id
+        var suffix = 2
+        while wikiEntries.contains(where: { $0.id == id }) {
+            id = "\(entry.id)-\(suffix)"
+            suffix += 1
+        }
+        let stored = id == entry.id ? entry : WikiEntry(id: id, title: entry.title, description: entry.description, aliases: entry.aliases)
+        wikiEntries.append(stored)
+        selectedItemID = "wiki-\(stored.id)"
+    }
+
     // MARK: - Private
+
+    private func spellSidebarGroups() -> [SidebarItem] {
+        let grouped = Dictionary(grouping: spellEntries, by: \.level)
+        return (0...9).compactMap { level -> SidebarItem? in
+            guard let spells = grouped[level], !spells.isEmpty else { return nil }
+            let groupTitle = level == 0 ? "Cantrips" : "Level \(level.romanNumeral)"
+            return SidebarItem(
+                id: "wiki-spells-\(level)",
+                title: groupTitle,
+                systemImage: level == 0 ? "sparkle" : "sparkles",
+                children: spells.map { spell in
+                    SidebarItem(id: "spell-\(spell.id)", title: spell.name, systemImage: "sparkle", children: nil)
+                }
+            )
+        }
+    }
 
     private func assignStatus(_ status: StatusCondition, to combatentID: Combatent.ID) {
         guard let index = combatents.firstIndex(where: { $0.id == combatentID }) else { return }

@@ -15,7 +15,11 @@ let testMonsters: [Monster] = [
         abilityScores: AbilityScores(strength: 8, dexterity: 14, constitution: 10, intelligence: 10, wisdom: 8, charisma: 8),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(),
-        skills: [SkillProficiency(skill: "Stealth", bonus: 6)],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 8, dexterity: 14, constitution: 10, intelligence: 10, wisdom: 8, charisma: 8),
+            proficiencyBonus: 2,
+            proficientNames: ["Stealth"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],
@@ -51,7 +55,11 @@ let testMonsters: [Monster] = [
         abilityScores: AbilityScores(strength: 16, dexterity: 12, constitution: 16, intelligence: 7, wisdom: 11, charisma: 10),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(),
-        skills: [SkillProficiency(skill: "Intimidation", bonus: 2)],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 16, dexterity: 12, constitution: 16, intelligence: 7, wisdom: 11, charisma: 10),
+            proficiencyBonus: 2,
+            proficientNames: ["Intimidation"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],
@@ -87,7 +95,11 @@ let testMonsters: [Monster] = [
         abilityScores: AbilityScores(strength: 18, dexterity: 13, constitution: 20, intelligence: 7, wisdom: 9, charisma: 7),
         proficiencyBonus: 3,
         savingThrowProficiencies: SavingThrowProficiencies(),
-        skills: [SkillProficiency(skill: "Perception", bonus: 2)],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 18, dexterity: 13, constitution: 20, intelligence: 7, wisdom: 9, charisma: 7),
+            proficiencyBonus: 3,
+            proficientNames: ["Perception"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],
@@ -124,7 +136,11 @@ let testMonsters: [Monster] = [
         abilityScores: AbilityScores(strength: 10, dexterity: 14, constitution: 18, intelligence: 17, wisdom: 15, charisma: 17),
         proficiencyBonus: 5,
         savingThrowProficiencies: SavingThrowProficiencies(intelligence: true, wisdom: true, charisma: true),
-        skills: [SkillProficiency(skill: "Perception", bonus: 12)],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 10, dexterity: 14, constitution: 18, intelligence: 17, wisdom: 15, charisma: 17),
+            proficiencyBonus: 5,
+            proficientNames: ["Perception"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],
@@ -167,10 +183,11 @@ let testMonsters: [Monster] = [
         abilityScores: AbilityScores(strength: 27, dexterity: 10, constitution: 25, intelligence: 16, wisdom: 13, charisma: 21),
         proficiencyBonus: 6,
         savingThrowProficiencies: SavingThrowProficiencies(dexterity: true, constitution: true, wisdom: true, charisma: true),
-        skills: [
-            SkillProficiency(skill: "Perception", bonus: 13),
-            SkillProficiency(skill: "Stealth", bonus: 6)
-        ],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 27, dexterity: 10, constitution: 25, intelligence: 16, wisdom: 13, charisma: 21),
+            proficiencyBonus: 6,
+            proficientNames: ["Perception", "Stealth"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [.fire],
@@ -214,7 +231,11 @@ let testMonsters: [Monster] = [
         abilityScores: AbilityScores(strength: 14, dexterity: 3, constitution: 20, intelligence: 1, wisdom: 6, charisma: 1),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(),
-        skills: [],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 14, dexterity: 3, constitution: 20, intelligence: 1, wisdom: 6, charisma: 1),
+            proficiencyBonus: 2,
+            proficientNames: []
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],
@@ -255,7 +276,11 @@ let testMonsters: [Monster] = [
         abilityScores: AbilityScores(strength: 17, dexterity: 12, constitution: 15, intelligence: 5, wisdom: 13, charisma: 8),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(),
-        skills: [SkillProficiency(skill: "Stealth", bonus: 5)],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 17, dexterity: 12, constitution: 15, intelligence: 5, wisdom: 13, charisma: 8),
+            proficiencyBonus: 2,
+            proficientNames: ["Stealth"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [.acid],
@@ -291,7 +316,11 @@ let testMonsters: [Monster] = [
         abilityScores: AbilityScores(strength: 10, dexterity: 14, constitution: 15, intelligence: 6, wisdom: 8, charisma: 5),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(),
-        skills: [],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 10, dexterity: 14, constitution: 15, intelligence: 6, wisdom: 8, charisma: 5),
+            proficiencyBonus: 2,
+            proficientNames: []
+        ),
         damageVulnerabilities: [.bludgeoning],
         damageResistances: [],
         damageImmunities: [.poison],
@@ -322,7 +351,11 @@ let testMonsters: [Monster] = [
         abilityScores: AbilityScores(strength: 13, dexterity: 6, constitution: 16, intelligence: 3, wisdom: 6, charisma: 5),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(wisdom: true),
-        skills: [],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 13, dexterity: 6, constitution: 16, intelligence: 3, wisdom: 6, charisma: 5),
+            proficiencyBonus: 2,
+            proficientNames: []
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [.poison],
@@ -357,7 +390,11 @@ let testMonsters: [Monster] = [
         abilityScores: AbilityScores(strength: 20, dexterity: 12, constitution: 17, intelligence: 3, wisdom: 12, charisma: 7),
         proficiencyBonus: 2,
         savingThrowProficiencies: SavingThrowProficiencies(),
-        skills: [SkillProficiency(skill: "Perception", bonus: 3)],
+        skills: makeAllSkills(
+            abilityScores: AbilityScores(strength: 20, dexterity: 12, constitution: 17, intelligence: 3, wisdom: 12, charisma: 7),
+            proficiencyBonus: 2,
+            proficientNames: ["Perception"]
+        ),
         damageVulnerabilities: [],
         damageResistances: [],
         damageImmunities: [],
