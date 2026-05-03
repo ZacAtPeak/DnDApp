@@ -10,6 +10,8 @@ final class CampaignViewModel {
     var isInitiativeTargeted = false
     var editingCombatentID: Combatent.ID?
     var isStatusPalettePresented = false
+    var isLongRestConfirmationPresented = false
+    var isCharacterCreationPresented = false
     var pendingStatus: StatusCondition?
 
     private let dataService: CampaignDataService
@@ -41,6 +43,60 @@ final class CampaignViewModel {
     var selectedInitiativeCombatent: Combatent? {
         guard let selectedInitiativeCombatentID else { return nil }
         return combatents.first { $0.id == selectedInitiativeCombatentID }
+    }
+
+    var sidebarItems: [SidebarItem] {
+        [
+            SidebarItem(
+                id: "players",
+                title: "Players",
+                systemImage: "person.2",
+                children: testPlayers.map { player in
+                    SidebarItem(
+                        id: "player-\(player.id.uuidString)",
+                        title: player.name,
+                        systemImage: "person",
+                        children: nil
+                    )
+                }
+            ),
+            SidebarItem(
+                id: "npcs",
+                title: "NPCs",
+                systemImage: "person.3",
+                children: [
+                    SidebarItem(
+                        id: "npc-monsters",
+                        title: "Monsters",
+                        systemImage: "ant",
+                        children: testMonsters.map { monster in
+                            SidebarItem(
+                                id: "monster-\(monster.id.uuidString)",
+                                title: monster.name,
+                                systemImage: "ant.fill",
+                                children: nil
+                            )
+                        }
+                    ),
+                    SidebarItem(
+                        id: "npc-characters",
+                        title: "Characters",
+                        systemImage: "person.2",
+                        children: testNPCs.map { npc in
+                            SidebarItem(
+                                id: "character-\(npc.id.uuidString)",
+                                title: npc.name,
+                                systemImage: "person.fill",
+                                children: nil
+                            )
+                        }
+                    ),
+                    SidebarItem(id: "npc-other", title: "Other", systemImage: "square.grid.2x2", children: nil)
+                ]
+            ),
+            SidebarItem(id: "public-assets", title: "Public Assets", systemImage: "globe", children: nil),
+            SidebarItem(id: "private-assets", title: "Private Assets", systemImage: "lock", children: nil)
+        ]
     }
 
     var selectedSidebarItem: SidebarItem? {
@@ -173,9 +229,40 @@ final class CampaignViewModel {
         combatents.sort { $0.initiative > $1.initiative }
     }
 
+    func advanceTurn() {
+        guard !combatents.isEmpty else { return }
+        let currentIndex = combatents.firstIndex(where: { $0.isTurn }) ?? -1
+        let nextIndex = (currentIndex + 1) % combatents.count
+        if currentIndex >= 0 {
+            combatents[currentIndex].isTurn = false
+        }
+        combatents[nextIndex].isTurn = true
+    }
+
+    func rewindTurn() {
+        guard !combatents.isEmpty else { return }
+        let currentIndex = combatents.firstIndex(where: { $0.isTurn }) ?? combatents.count
+        let prevIndex = (currentIndex - 1 + combatents.count) % combatents.count
+        if currentIndex < combatents.count {
+            combatents[currentIndex].isTurn = false
+        }
+        combatents[prevIndex].isTurn = true
+    }
+
+    func makeCurrentTurn(for combatentID: Combatent.ID) {
+        for index in combatents.indices {
+            combatents[index].isTurn = combatents[index].id == combatentID
+        }
+    }
+
     func queueStatus(_ status: StatusCondition) {
         pendingStatus = status
         isStatusPalettePresented = false
+    }
+
+    func createPlayerCharacter(_ player: PlayerCharacter) {
+        testPlayers.append(player)
+        selectedItemID = "player-\(player.id.uuidString)"
     }
 
     // MARK: - Private

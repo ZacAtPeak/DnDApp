@@ -6,7 +6,7 @@ struct CampaignToolbar: ToolbarContent {
     var body: some ToolbarContent {
         ToolbarItem {
             Button {
-                viewModel.longRest()
+                viewModel.isLongRestConfirmationPresented = true
             } label: {
                 Label("Long Rest", systemImage: "bed.double")
             }
@@ -29,7 +29,9 @@ struct CampaignToolbar: ToolbarContent {
 
         ToolbarItem {
             Menu {
-                Button("Character") {}
+                Button("Character") {
+                    viewModel.isCharacterCreationPresented = true
+                }
                 Button("Private Asset") {}
                 Button("Public Asset") {}
                 Button("Statuses") {

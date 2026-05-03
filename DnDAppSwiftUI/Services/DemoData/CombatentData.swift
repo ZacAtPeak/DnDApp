@@ -26,9 +26,9 @@ let testCombatents: [Combatent] = [
         ],
         creatureType: "Dwarf",
         spellSlots: [
-            SpellSlot(level: 1, max: 4, available: 4),
-            SpellSlot(level: 2, max: 3, available: 3),
-            SpellSlot(level: 3, max: 2, available: 2),
+            SpellSlot(level: 1, max: 4, available: 2),
+            SpellSlot(level: 2, max: 3, available: 1),
+            SpellSlot(level: 3, max: 2, available: 0),
             SpellSlot(level: 4, max: 0, available: 0),
             SpellSlot(level: 5, max: 0, available: 0),
             SpellSlot(level: 6, max: 0, available: 0),
@@ -58,8 +58,8 @@ let testCombatents: [Combatent] = [
         status: nil,
         creatureType: "Humanoid",
         spellSlots: [
-            SpellSlot(level: 1, max: 4, available: 4),
-            SpellSlot(level: 2, max: 3, available: 3),
+            SpellSlot(level: 1, max: 4, available: 3),
+            SpellSlot(level: 2, max: 3, available: 1),
             SpellSlot(level: 3, max: 0, available: 0),
             SpellSlot(level: 4, max: 0, available: 0),
             SpellSlot(level: 5, max: 0, available: 0),

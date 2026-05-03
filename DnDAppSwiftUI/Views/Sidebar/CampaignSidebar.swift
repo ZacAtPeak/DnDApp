@@ -12,7 +12,7 @@ struct CampaignSidebar: View {
     }
 
     var body: some View {
-        List(sidebarItems, children: \.children, selection: sidebarSelection) { item in
+        List(viewModel.sidebarItems, children: \.children, selection: sidebarSelection) { item in
             Label(item.title, systemImage: item.systemImage)
                 .draggable(item.id)
         }

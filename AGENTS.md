@@ -78,6 +78,7 @@ DnDAppSwiftUI/
     ├── CampaignRootView.swift      # NavigationSplitView root
     ├── CampaignDetailPane.swift    # Detail pane content switcher
     ├── CampaignToolbar.swift       # ToolbarContent for Long Rest, Statuses, Add
+    ├── CharacterCreationView.swift # Sheet form for building a new PlayerCharacter
     ├── Common/                     # Reusable layout components (<100 lines each)
     │   ├── AbilityScoreCell.swift
     │   ├── AbilityScoresView.swift
@@ -116,6 +117,7 @@ DnDAppSwiftUI/
 - `selectedInitiativeCombatentID: Combatent.ID?` — selected tracker card
 - `editingCombatentID: Combatent.ID?` — triggers editor sheet
 - `isStatusPalettePresented: Bool` & `pendingStatus: StatusCondition?` — status assignment flow
+- `isCharacterCreationPresented: Bool` — drives the `CharacterCreationView` sheet; `createPlayerCharacter(_:)` appends the result to `testPlayers` and rebuilds the sidebar
 
 Views observe the view model via `@Bindable` (for bindings) or plain property access (for reads). The view model delegates data lookups and combatent creation to `CampaignDataService`.
 
@@ -179,7 +181,9 @@ All demo data lives in `Services/DemoData/` as global constants (`testMonsters`,
 **Toolbar:** `CampaignToolbar` (`ToolbarContent`) provides:
 - **Long Rest** — resets all combatants' and players' HP and clears statuses
 - **Statuses** — opens `StatusPaletteView` popover to queue or drag statuses
-- **Add** menu — placeholder for adding characters, assets, or statuses
+- **Add** menu — opens `CharacterCreationView` to add a new player character (other entries still placeholders)
+
+**Character Creation:** `CharacterCreationView` is a form-based sheet (presented from the toolbar Add menu) that builds a `PlayerCharacter` and hands it back via an `onSave` closure. `CampaignRootView` wires the closure to `CampaignViewModel.createPlayerCharacter(_:)`.
 
 ### Demo Data
 

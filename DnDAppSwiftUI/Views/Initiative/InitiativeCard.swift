@@ -1,19 +1,68 @@
 import SwiftUI
 
 struct InitiativeCard: View {
-    var combatent: Combatent
+    @Binding var combatent: Combatent
     var isSelected: Bool
     var onSelect: () -> Void
     var onEdit: () -> Void
     var onRemove: () -> Void
+    var onMakeTurn: () -> Void
     var onStatusDrop: ([String]) -> Bool
     @State private var isStatusTargeted = false
+    @State private var isFlipped = false
 
     private var activeStatuses: [StatusCondition] {
         combatent.status ?? []
     }
 
     var body: some View {
+        ZStack {
+            frontView
+                .opacity(isFlipped ? 0 : 1)
+                .scaleEffect(isFlipped ? 0.9 : 1)
+                .allowsHitTesting(!isFlipped)
+                .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .onTapGesture(count: 2) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isFlipped = true
+                    }
+                }
+                .onTapGesture {
+                    onSelect()
+                }
+                .onLongPressGesture {
+                    onEdit()
+                }
+
+            backView
+                .opacity(isFlipped ? 1 : 0)
+                .scaleEffect(isFlipped ? 1 : 0.9)
+                .allowsHitTesting(isFlipped)
+        }
+        .animation(.easeInOut(duration: 0.2), value: isFlipped)
+        .frame(width: 160, alignment: .leading)
+        .dropDestination(for: String.self) { payloads, _ in
+            onStatusDrop(payloads)
+        } isTargeted: { targeted in
+            isStatusTargeted = targeted
+        }
+        .contextMenu {
+            Button("Make Current Turn") {
+                onMakeTurn()
+            }
+            Button("Edit") {
+                onEdit()
+            }
+            Button("Remove from Initiative", role: .destructive) {
+                onRemove()
+            }
+        }
+        .help("Double-click to quick-edit HP and spell slots. Tap the X to flip back. Long press or secondary-click to edit.")
+    }
+
+    // MARK: - Front
+
+    private var frontView: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 2) {
@@ -44,11 +93,18 @@ struct InitiativeCard: View {
             if !combatent.spellSlots.isEmpty {
                 VStack(alignment: .leading, spacing: 2) {
                     ForEach(combatent.spellSlots, id: \.level) { slot in
-                        if slot.available > 0 {
+                        if slot.max > 0 {
                             HStack(spacing: 2) {
                                 ForEach(0..<slot.available, id: \.self) { _ in
                                     Image(systemName: "circle.fill")
                                         .font(.system(size: 7))
+                                }
+                                let used = slot.max - slot.available
+                                if used > 0 {
+                                    ForEach(0..<used, id: \.self) { _ in
+                                        Image(systemName: "circle")
+                                            .font(.system(size: 7))
+                                    }
                                 }
                             }
                         }
@@ -88,24 +144,116 @@ struct InitiativeCard: View {
                     .stroke(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
             }
         }
+        .overlay(alignment: .topLeading) {
+            if combatent.isTurn {
+                Circle()
+                    .fill(Color.orange)
+                    .frame(width: 8, height: 8)
+                    .padding([.top, .leading], 10)
+            }
+        }
         .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
-        .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .onTapGesture(perform: onSelect)
-        .onLongPressGesture(perform: onEdit)
-        .dropDestination(for: String.self) { payloads, _ in
-            onStatusDrop(payloads)
-        } isTargeted: { targeted in
-            isStatusTargeted = targeted
-        }
-        .contextMenu {
-            Button("Edit") {
-                onEdit()
+    }
+
+    // MARK: - Back
+
+    private var backView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isFlipped = false
+                    }
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
             }
-            Button("Remove from Initiative", role: .destructive) {
-                onRemove()
+
+            Text(combatent.name)
+                .font(.caption)
+                .fontWeight(.bold)
+                .lineLimit(1)
+
+            if !combatent.isLairAction {
+                HStack(spacing: 4) {
+                    Text("HP")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                    Spacer()
+                    Button {
+                        combatent.currentHP = max(0, combatent.currentHP - 1)
+                    } label: {
+                        Image(systemName: "minus.circle")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.plain)
+
+                    Text("\(combatent.currentHP)/\(combatent.maxHP)")
+                        .font(.caption2)
+                        .monospacedDigit()
+
+                    Button {
+                        combatent.currentHP = min(combatent.maxHP, combatent.currentHP + 1)
+                    } label: {
+                        Image(systemName: "plus.circle")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.plain)
+                }
             }
+
+            if !combatent.spellSlots.isEmpty {
+                ForEach(combatent.spellSlots.indices, id: \.self) { index in
+                    if combatent.spellSlots[index].max > 0 {
+                        HStack(spacing: 4) {
+                            Text("L\(combatent.spellSlots[index].level)")
+                                .font(.caption2)
+                                .fontWeight(.semibold)
+                            Spacer()
+                            Button {
+                                combatent.spellSlots[index].available = max(0, combatent.spellSlots[index].available - 1)
+                            } label: {
+                                Image(systemName: "minus.circle")
+                                    .font(.caption)
+                            }
+                            .buttonStyle(.plain)
+
+                            Text("\(combatent.spellSlots[index].available)/\(combatent.spellSlots[index].max)")
+                                .font(.caption2)
+                                .monospacedDigit()
+
+                            Button {
+                                combatent.spellSlots[index].available = min(combatent.spellSlots[index].max, combatent.spellSlots[index].available + 1)
+                            } label: {
+                                Image(systemName: "plus.circle")
+                                    .font(.caption)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            } else {
+                Text("No spell slots")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
         }
-        .help("Long press or secondary-click to edit")
+        .padding()
+        .frame(width: 160, alignment: .leading)
+        .background(.thinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(cardStrokeColor, lineWidth: isSelected || combatent.isTurn ? 2 : 1)
+        }
+        .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
     }
 
     private var cardStrokeColor: Color {

@@ -12,6 +12,7 @@ struct DnDAppSwiftUIApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .frame(minWidth: 900, maxWidth: .infinity, minHeight: 600, maxHeight: .infinity)
         }
         .defaultSize(width: 1250, height: 875)
     }

@@ -12,6 +12,28 @@ struct InitiativeTrackerStrip: View {
 
                 Spacer()
 
+                HStack(spacing: 8) {
+                    Button {
+                        viewModel.rewindTurn()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.combatents.isEmpty)
+
+                    Button {
+                        viewModel.advanceTurn()
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.combatents.isEmpty)
+                }
+
                 Menu {
                     Button("Add Lair Action") {
                         viewModel.addLairAction()
@@ -28,13 +50,13 @@ struct InitiativeTrackerStrip: View {
             .padding(.top)
 
             ScrollView(.horizontal) {
-                HStack(alignment: .top, spacing: 16) {
+                LazyHStack(alignment: .top, spacing: 16) {
                     if viewModel.combatents.isEmpty {
                         emptyState
                     } else {
                         ForEach($viewModel.combatents) { $combatent in
                             InitiativeCard(
-                                combatent: combatent,
+                                combatent: $combatent,
                                 isSelected: viewModel.selectedInitiativeCombatentID == combatent.id
                             ) {
                                 viewModel.selectOrAssignStatus(to: combatent)
@@ -42,6 +64,8 @@ struct InitiativeTrackerStrip: View {
                                 viewModel.beginEditing(combatentID: combatent.id)
                             } onRemove: {
                                 viewModel.removeCombatent(id: combatent.id)
+                            } onMakeTurn: {
+                                viewModel.makeCurrentTurn(for: combatent.id)
                             } onStatusDrop: { payloads in
                                 viewModel.assignDraggedStatus(from: payloads, to: combatent.id)
                             }
@@ -51,7 +75,9 @@ struct InitiativeTrackerStrip: View {
                 .padding(.horizontal)
                 .padding(.bottom)
             }
+            .frame(maxHeight: .infinity)
         }
+        .frame(maxWidth: .infinity)
         .background(.bar)
         .overlay {
             if viewModel.isInitiativeTargeted {
