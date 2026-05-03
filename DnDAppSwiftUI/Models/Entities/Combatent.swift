@@ -5,6 +5,7 @@ struct Combatent: Identifiable {
     var name: String
     var currentHP: Int
     var maxHP: Int
+    var temporaryHP: Int = 0
     var initiative: Double
     var isTurn: Bool
     var status: [StatusCondition]?

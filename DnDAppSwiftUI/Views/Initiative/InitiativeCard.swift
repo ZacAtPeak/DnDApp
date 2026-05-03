@@ -15,6 +15,34 @@ struct InitiativeCard: View {
         combatent.status ?? []
     }
 
+    private var isDefeated: Bool {
+        !combatent.isLairAction && combatent.currentHP == 0
+    }
+
+    private var healthRatio: CGFloat {
+        guard combatent.maxHP > 0 else { return 0 }
+        return min(max(CGFloat(combatent.currentHP) / CGFloat(combatent.maxHP), 0), 1)
+    }
+
+    private var temporaryHealthRatio: CGFloat {
+        guard combatent.maxHP > 0 else { return 0 }
+        return min(max(CGFloat(combatent.temporaryHP) / CGFloat(combatent.maxHP), 0), 1)
+    }
+
+    private var healthBarColor: Color {
+        if healthRatio > 0 && healthRatio < 0.1 {
+            return .red
+        }
+        return .green
+    }
+
+    private var healthText: String {
+        if combatent.temporaryHP > 0 {
+            return "\(combatent.currentHP)+\(combatent.temporaryHP)/\(combatent.maxHP)"
+        }
+        return "\(combatent.currentHP)/\(combatent.maxHP)"
+    }
+
     var body: some View {
         ZStack {
             frontView
@@ -39,7 +67,10 @@ struct InitiativeCard: View {
                 .scaleEffect(isFlipped ? 1 : 0.9)
                 .allowsHitTesting(isFlipped)
         }
+        .grayscale(isDefeated ? 1 : 0)
+        .opacity(isDefeated ? 0.55 : 1)
         .animation(.easeInOut(duration: 0.2), value: isFlipped)
+        .animation(.easeInOut(duration: 0.2), value: isDefeated)
         .frame(width: 160, alignment: .leading)
         .dropDestination(for: String.self) { payloads, _ in
             onStatusDrop(payloads)
@@ -86,8 +117,7 @@ struct InitiativeCard: View {
             }
 
             if !combatent.isLairAction {
-                Text("HP: \(combatent.currentHP)/\(combatent.maxHP)")
-                    .font(.subheadline)
+                healthBar
             }
 
             if !combatent.spellSlots.isEmpty {
@@ -155,6 +185,44 @@ struct InitiativeCard: View {
         .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
     }
 
+    private var healthBar: some View {
+        GeometryReader { proxy in
+            let width = proxy.size.width
+            let healthWidth = width * healthRatio
+            let temporaryWidth = width * temporaryHealthRatio
+            let temporaryOffset = min(healthWidth, max(width - temporaryWidth, 0))
+
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color.secondary.opacity(0.16))
+
+                Rectangle()
+                    .fill(healthBarColor)
+                    .frame(width: healthWidth)
+
+                if combatent.temporaryHP > 0 {
+                    Rectangle()
+                        .fill(Color.green.opacity(0.45))
+                        .frame(width: temporaryWidth)
+                        .offset(x: temporaryOffset)
+                }
+
+                Text(healthText)
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.45), radius: 1, y: 1)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 8)
+            }
+            .clipShape(Capsule())
+        }
+        .frame(height: 22)
+    }
+
     // MARK: - Back
 
     private var backView: some View {
@@ -199,6 +267,32 @@ struct InitiativeCard: View {
 
                     Button {
                         combatent.currentHP = min(combatent.maxHP, combatent.currentHP + 1)
+                    } label: {
+                        Image(systemName: "plus.circle")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                HStack(spacing: 4) {
+                    Text("Temp")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                    Spacer()
+                    Button {
+                        combatent.temporaryHP = max(0, combatent.temporaryHP - 1)
+                    } label: {
+                        Image(systemName: "minus.circle")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.plain)
+
+                    Text("\(combatent.temporaryHP)")
+                        .font(.caption2)
+                        .monospacedDigit()
+
+                    Button {
+                        combatent.temporaryHP = min(999, combatent.temporaryHP + 1)
                     } label: {
                         Image(systemName: "plus.circle")
                             .font(.caption)

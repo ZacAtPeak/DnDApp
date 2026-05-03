@@ -180,6 +180,7 @@ final class CampaignViewModel {
     func longRest() {
         for index in combatents.indices {
             combatents[index].currentHP = combatents[index].maxHP
+            combatents[index].temporaryHP = 0
             combatents[index].status = nil
             for slotIndex in combatents[index].spellSlots.indices {
                 combatents[index].spellSlots[slotIndex].available = combatents[index].spellSlots[slotIndex].max

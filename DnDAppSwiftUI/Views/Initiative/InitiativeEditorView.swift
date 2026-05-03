@@ -37,6 +37,10 @@ struct InitiativeEditorView: View {
                     Stepper(value: $combatent.maxHP, in: 1...999) {
                         StatValueRow(title: "Max HP", value: combatent.maxHP)
                     }
+
+                    Stepper(value: $combatent.temporaryHP, in: 0...999) {
+                        StatValueRow(title: "Temporary HP", value: combatent.temporaryHP)
+                    }
                 }
 
                 Section("Spell Slots") {
