@@ -33,6 +33,7 @@ final class CampaignViewModel {
     var searchQuery = ""
     var isRollHistoryPresented = false
     var rollHistory: [RollEntry] = []
+    var hasNewRollHistory = false
     var pendingStatus: StatusCondition?
 
     private let dataService: CampaignDataService
@@ -415,10 +416,16 @@ final class CampaignViewModel {
             timestamp: Date()
         )
         rollHistory.insert(entry, at: 0)
+        hasNewRollHistory = true
     }
 
     func clearRollHistory() {
         rollHistory.removeAll()
+        hasNewRollHistory = false
+    }
+
+    func markRollHistorySeen() {
+        hasNewRollHistory = false
     }
 
     func rollAbilityCheck(name: String, modifier: Int) {
@@ -463,6 +470,11 @@ final class CampaignViewModel {
             testPlayers[index].status = nil
             for slotIndex in testPlayers[index].spellSlots.indices {
                 testPlayers[index].spellSlots[slotIndex].available = testPlayers[index].spellSlots[slotIndex].max
+            }
+            for actionIndex in testPlayers[index].actions.indices {
+                if let maxUses = testPlayers[index].actions[actionIndex].maxUses {
+                    testPlayers[index].actions[actionIndex].remainingUses = maxUses
+                }
             }
         }
     }
@@ -548,6 +560,36 @@ final class CampaignViewModel {
         let stored = id == entry.id ? entry : WikiEntry(id: id, title: entry.title, description: entry.description, aliases: entry.aliases)
         wikiEntries.append(stored)
         selectedItemID = "wiki-\(stored.id)"
+    }
+
+    // MARK: - Action Use
+
+    func useAction(_ action: Attack, forEntity entityID: UUID, entityType: InventoryEntityType, name: String) {
+        var mutableAction = action
+        if let remaining = mutableAction.remainingUses, remaining > 0 {
+            mutableAction.remainingUses = remaining - 1
+        }
+
+        // Roll to-hit
+        let toHitRoll = Int.random(in: 1...20)
+        let toHitTotal = toHitRoll + action.hitBonus
+        logRoll(type: "Action", name: "\(name) — \(action.name) (Attack)", roll: toHitRoll, modifier: action.hitBonus, total: Double(toHitTotal))
+
+        // Roll damage
+        let damageResult = rollDice(action.damageRoll)
+        if damageResult.total > 0 {
+            logRoll(type: "Action", name: "\(name) — \(action.name) (Damage)", roll: damageResult.rollSum, modifier: damageResult.modifier, total: Double(damageResult.total))
+        }
+
+        // Update entity actions
+        switch entityType {
+        case .player:
+            guard let playerIndex = testPlayers.firstIndex(where: { $0.id == entityID }) else { return }
+            guard let actionIndex = testPlayers[playerIndex].actions.firstIndex(where: { $0.id == action.id }) else { return }
+            testPlayers[playerIndex].actions[actionIndex] = mutableAction
+        case .monster, .npc:
+            break
+        }
     }
 
     // MARK: - Spell Casting

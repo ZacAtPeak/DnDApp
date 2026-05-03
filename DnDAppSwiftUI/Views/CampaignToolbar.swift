@@ -14,17 +14,21 @@ struct CampaignToolbar: ToolbarContent {
         }
 
         ToolbarItem {
-            Button {
-                viewModel.isStatusPalettePresented.toggle()
+            Menu {
+                Button("Statuses") {
+                    viewModel.isStatusPalettePresented = true
+                }
+                Button("Loot Generator") {}
+                Button("Inventory Generator") {}
             } label: {
-                Label(viewModel.statusPaletteButtonTitle, systemImage: "cross.case")
+                Label("Tools", systemImage: "wrench.and.screwdriver")
             }
             .popover(isPresented: $viewModel.isStatusPalettePresented) {
                 StatusPaletteView(statuses: viewModel.assignableStatuses) { status in
                     viewModel.queueStatus(status)
                 }
             }
-            .help(viewModel.statusPaletteHelpText)
+            .help("Tools")
         }
 
         ToolbarItem {
@@ -37,9 +41,6 @@ struct CampaignToolbar: ToolbarContent {
                 }
                 Button("Private Asset") {}
                 Button("Public Asset") {}
-                Button("Statuses") {
-                    viewModel.isStatusPalettePresented = true
-                }
             } label: {
                 Image(systemName: "plus")
             }
@@ -48,8 +49,19 @@ struct CampaignToolbar: ToolbarContent {
         ToolbarItem {
             Button {
                 viewModel.isRollHistoryPresented.toggle()
+                if viewModel.isRollHistoryPresented {
+                    viewModel.markRollHistorySeen()
+                }
             } label: {
-                Label("Roll History", systemImage: "dice")
+                ZStack {
+                    Label("Roll History", systemImage: "dice")
+                    if viewModel.hasNewRollHistory {
+                        Circle()
+                            .fill(Color.red)
+                            .frame(width: 8, height: 8)
+                            .offset(x: 10, y: -8)
+                    }
+                }
             }
             .help("Show roll history")
         }

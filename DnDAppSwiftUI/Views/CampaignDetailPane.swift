@@ -26,6 +26,11 @@ struct CampaignDetailPane: View {
                             if let entityID, let entityType {
                                 viewModel.castSpell(spell, atLevel: slotLevel, forEntity: entityID, entityType: entityType, name: entityName)
                             }
+                        },
+                        onUseAction: { action in
+                            if let entityID, entityType == .player {
+                                viewModel.useAction(action, forEntity: entityID, entityType: .player, name: entityName)
+                            }
                         }
                     )
                 } else if let selectedPlayer = viewModel.selectedPlayer {
@@ -46,6 +51,9 @@ struct CampaignDetailPane: View {
                         },
                         onCastSpell: { spell, slotLevel in
                             viewModel.castSpell(spell, atLevel: slotLevel, forEntity: selectedPlayer.id, entityType: .player, name: selectedPlayer.name)
+                        },
+                        onUseAction: { action in
+                            viewModel.useAction(action, forEntity: selectedPlayer.id, entityType: .player, name: selectedPlayer.name)
                         }
                     )
                 } else if let selectedMonster = viewModel.selectedMonster {

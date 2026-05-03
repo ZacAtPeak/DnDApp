@@ -10,6 +10,7 @@ struct PlayerCharacterDetailView: View {
     var onRollAbility: ((String, Int) -> Void)?
     var onRollSkill: ((String, Int) -> Void)?
     var onCastSpell: ((SpellEntry, Int) -> Void)?
+    var onUseAction: ((Attack) -> Void)?
 
     private var activeStatuses: [StatusCondition] {
         encounterCombatent?.status ?? player.status ?? []
@@ -73,7 +74,7 @@ struct PlayerCharacterDetailView: View {
             )
             SkillsView(skills: player.skills, onRoll: onRollSkill)
             SpecialAbilitiesView(abilities: player.specialAbilities)
-            ActionsView(actions: player.actions)
+            ActionsView(actions: player.actions, onUseAction: onUseAction)
             InventorySection(inventory: inventory, allLoot: allLoot, onToggleEquip: onToggleEquip)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)

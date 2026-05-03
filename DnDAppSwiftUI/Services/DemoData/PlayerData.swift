@@ -180,7 +180,7 @@ var testPlayers: [PlayerCharacter] = [
         ],
         actions: [
             Attack(name: "Longsword", hitBonus: 5, reach: "5 ft.", damageRoll: "1d8+3", damageType: .slashing, description: "Versatile: 1d10+3."),
-            Attack(name: "Shield Bash", hitBonus: 5, reach: "5 ft.", damageRoll: "1d4+3", damageType: .bludgeoning, description: "DC 13 STR save or target is knocked prone.")
+            Attack(name: "Shield Bash", hitBonus: 5, reach: "5 ft.", damageRoll: "1d4+3", damageType: .bludgeoning, description: "DC 13 STR save or target is knocked prone.", maxUses: 3, remainingUses: 3)
         ],
         spellSlots: [
             SpellSlot(level: 1, max: 3, available: 1)
