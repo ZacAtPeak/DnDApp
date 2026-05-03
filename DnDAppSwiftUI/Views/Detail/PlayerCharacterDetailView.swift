@@ -43,7 +43,7 @@ struct PlayerCharacterDetailView: View {
             )
 
             StatusesView(statuses: activeStatuses)
-            SpellSlotsView(slots: player.spellSlots, encounterSlotCount: encounterCombatent?.spellSlotCount)
+            SpellSlotsView(slots: encounterCombatent?.spellSlots ?? player.spellSlots)
             AbilityScoresView(scores: player.abilityScores)
             SpecialAbilitiesView(abilities: player.specialAbilities)
             ActionsView(actions: player.actions)

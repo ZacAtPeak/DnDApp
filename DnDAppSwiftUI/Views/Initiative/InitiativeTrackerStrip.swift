@@ -5,11 +5,27 @@ struct InitiativeTrackerStrip: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Initiative Tracker")
-                .font(.title3)
-                .fontWeight(.semibold)
-                .padding(.horizontal)
-                .padding(.top)
+            HStack {
+                Text("Initiative Tracker")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+
+                Spacer()
+
+                Menu {
+                    Button("Add Lair Action") {
+                        viewModel.addLairAction()
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                }
+                .menuStyle(.button)
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal)
+            .padding(.top)
 
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: 16) {
@@ -24,6 +40,8 @@ struct InitiativeTrackerStrip: View {
                                 viewModel.selectOrAssignStatus(to: combatent)
                             } onEdit: {
                                 viewModel.beginEditing(combatentID: combatent.id)
+                            } onRemove: {
+                                viewModel.removeCombatent(id: combatent.id)
                             } onStatusDrop: { payloads in
                                 viewModel.assignDraggedStatus(from: payloads, to: combatent.id)
                             }

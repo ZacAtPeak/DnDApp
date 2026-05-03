@@ -110,11 +110,11 @@ let testNPCs: [NPC] = [
             Attack(name: "Fire Bolt (Cantrip)", hitBonus: 9, reach: "120 ft.", damageRoll: "3d10", damageType: .fire)
         ],
         spellSlots: [
-            SpellSlot(count: 4, level: 1),
-            SpellSlot(count: 3, level: 2),
-            SpellSlot(count: 3, level: 3),
-            SpellSlot(count: 3, level: 4),
-            SpellSlot(count: 1, level: 5)
+            SpellSlot(level: 1, max: 4, available: 4),
+            SpellSlot(level: 2, max: 3, available: 3),
+            SpellSlot(level: 3, max: 3, available: 3),
+            SpellSlot(level: 4, max: 3, available: 3),
+            SpellSlot(level: 5, max: 1, available: 1)
         ],
         initiative: 8
     ),

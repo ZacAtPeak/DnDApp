@@ -71,8 +71,9 @@ final class CampaignDataService {
             initiative: rolledInitiative(for: player.abilityScores),
             isTurn: false,
             status: player.status,
-            spellSlotCount: player.spellSlotCount,
             creatureType: player.race,
+            spellSlots: player.spellSlots.normalizedToLevel9(),
+            speed: player.speed,
             sourceSidebarID: sidebarID
         )
     }
@@ -85,8 +86,9 @@ final class CampaignDataService {
             initiative: rolledInitiative(for: monster.abilityScores),
             isTurn: false,
             status: monster.status,
-            spellSlotCount: monster.spellSlotCount,
             creatureType: monster.type.rawValue,
+            spellSlots: monster.spellSlots.normalizedToLevel9(),
+            speed: monster.speed,
             sourceSidebarID: sidebarID
         )
     }
@@ -99,8 +101,9 @@ final class CampaignDataService {
             initiative: rolledInitiative(for: npc.abilityScores),
             isTurn: false,
             status: npc.status,
-            spellSlotCount: npc.spellSlotCount,
             creatureType: "Humanoid",
+            spellSlots: npc.spellSlots.normalizedToLevel9(),
+            speed: npc.speed,
             sourceSidebarID: sidebarID
         )
     }

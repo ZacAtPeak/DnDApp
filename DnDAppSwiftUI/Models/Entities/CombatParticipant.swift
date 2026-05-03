@@ -6,17 +6,13 @@ protocol CombatParticipant: Identifiable where ID == UUID {
     var maxHP: Int { get }
     var abilityScores: AbilityScores { get }
     var status: [StatusCondition]? { get }
-    var spellSlotCount: Int { get }
+    var spellSlots: [SpellSlot] { get }
 }
 
 extension Monster: CombatParticipant {
-    var spellSlotCount: Int { 0 }
+    var spellSlots: [SpellSlot] { [] }
 }
 
-extension NPC: CombatParticipant {
-    var spellSlotCount: Int { spellSlots.reduce(0) { $0 + $1.count } }
-}
+extension NPC: CombatParticipant {}
 
-extension PlayerCharacter: CombatParticipant {
-    var spellSlotCount: Int { spellSlots.reduce(0) { $0 + $1.count } }
-}
+extension PlayerCharacter: CombatParticipant {}

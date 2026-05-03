@@ -36,6 +36,7 @@ struct MonsterDetailView: View {
             }
 
             StatusesView(statuses: activeStatuses)
+            SpellSlotsView(slots: encounterCombatent?.spellSlots ?? monster.spellSlots)
             AbilityScoresView(scores: monster.abilityScores)
             SpecialAbilitiesView(abilities: monster.specialAbilities)
             ActionsView(actions: monster.actions)

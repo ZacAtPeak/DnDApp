@@ -8,7 +8,9 @@ struct Combatent: Identifiable {
     var initiative: Double
     var isTurn: Bool
     var status: [StatusCondition]?
-    var spellSlotCount: Int
     var creatureType: String? = nil
+    var spellSlots: [SpellSlot]
+    var speed: MovementSpeed
     var sourceSidebarID: String? = nil
+    var isLairAction: Bool = false
 }

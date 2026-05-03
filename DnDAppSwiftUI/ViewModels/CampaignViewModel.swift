@@ -69,8 +69,9 @@ final class CampaignViewModel {
                 initiative: 0,
                 isTurn: false,
                 status: nil,
-                spellSlotCount: 0,
-                sourceSidebarID: nil
+                creatureType: nil,
+                spellSlots: [],
+                speed: MovementSpeed(walk: 0)
             )
         } set: { updatedCombatent in
             guard let index = self.combatents.firstIndex(where: { $0.id == editingCombatentID }) else { return }
@@ -124,10 +125,16 @@ final class CampaignViewModel {
         for index in combatents.indices {
             combatents[index].currentHP = combatents[index].maxHP
             combatents[index].status = nil
+            for slotIndex in combatents[index].spellSlots.indices {
+                combatents[index].spellSlots[slotIndex].available = combatents[index].spellSlots[slotIndex].max
+            }
         }
         for index in testPlayers.indices {
             testPlayers[index].currentHP = testPlayers[index].maxHP
             testPlayers[index].status = nil
+            for slotIndex in testPlayers[index].spellSlots.indices {
+                testPlayers[index].spellSlots[slotIndex].available = testPlayers[index].spellSlots[slotIndex].max
+            }
         }
     }
 
@@ -137,6 +144,33 @@ final class CampaignViewModel {
 
     func dismissEditor() {
         editingCombatentID = nil
+    }
+
+    func removeCombatent(id: Combatent.ID) {
+        combatents.removeAll { $0.id == id }
+        if selectedInitiativeCombatentID == id {
+            selectedInitiativeCombatentID = nil
+        }
+        if editingCombatentID == id {
+            editingCombatentID = nil
+        }
+    }
+
+    func addLairAction() {
+        let lairAction = Combatent(
+            name: "Lair Action",
+            currentHP: 0,
+            maxHP: 0,
+            initiative: 20,
+            isTurn: false,
+            status: nil,
+            creatureType: "Lair Action",
+            spellSlots: [],
+            speed: MovementSpeed(walk: 0),
+            isLairAction: true
+        )
+        combatents.append(lairAction)
+        combatents.sort { $0.initiative > $1.initiative }
     }
 
     func queueStatus(_ status: StatusCondition) {

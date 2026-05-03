@@ -39,8 +39,8 @@ var testPlayers: [PlayerCharacter] = [
             Attack(name: "Fire Bolt (Cantrip)", hitBonus: 5, reach: "120 ft.", damageRoll: "2d10", damageType: .fire)
         ],
         spellSlots: [
-            SpellSlot(count: 4, level: 1),
-            SpellSlot(count: 3, level: 2)
+            SpellSlot(level: 1, max: 4, available: 4),
+            SpellSlot(level: 2, max: 3, available: 3)
         ],
         initiative: 12,
         status: [
@@ -132,9 +132,9 @@ var testPlayers: [PlayerCharacter] = [
             Attack(name: "Dagger", hitBonus: 6, reach: "5 ft. or 20/60 ft.", damageRoll: "1d4+3", damageType: .piercing)
         ],
         spellSlots: [
-            SpellSlot(count: 4, level: 1),
-            SpellSlot(count: 2, level: 2),
-            SpellSlot(count: 2, level: 3)
+            SpellSlot(level: 1, max: 4, available: 4),
+            SpellSlot(level: 2, max: 2, available: 2),
+            SpellSlot(level: 3, max: 2, available: 2)
         ],
         initiative: 8,
         status: [
@@ -181,7 +181,7 @@ var testPlayers: [PlayerCharacter] = [
             Attack(name: "Shield Bash", hitBonus: 5, reach: "5 ft.", damageRoll: "1d4+3", damageType: .bludgeoning, description: "DC 13 STR save or target is knocked prone.")
         ],
         spellSlots: [
-            SpellSlot(count: 3, level: 1)
+            SpellSlot(level: 1, max: 3, available: 3)
         ],
         initiative: 10,
         status: [

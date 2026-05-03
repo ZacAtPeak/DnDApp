@@ -11,8 +11,9 @@ let testCombatents: [Combatent] = [
             StatusCondition(name: "Blessed", effect: "+1d4", desc: "Bonus to attack rolls and saving throws"),
             StatusCondition(name: "Poisoned", effect: "Disadvantage", desc: "Disadvantage on attack rolls and ability checks")
         ],
-        spellSlotCount: 0,
-        creatureType: "Human"
+        creatureType: "Human",
+        spellSlots: [],
+        speed: MovementSpeed(walk: 30)
     ),
     Combatent(
         name: "Cleric",
@@ -23,8 +24,19 @@ let testCombatents: [Combatent] = [
         status: [
             StatusCondition(name: "Concentrating", effect: "Spirit Guardians", desc: "Maintaining concentration on a spell")
         ],
-        spellSlotCount: 6,
-        creatureType: "Dwarf"
+        creatureType: "Dwarf",
+        spellSlots: [
+            SpellSlot(level: 1, max: 4, available: 4),
+            SpellSlot(level: 2, max: 3, available: 3),
+            SpellSlot(level: 3, max: 2, available: 2),
+            SpellSlot(level: 4, max: 0, available: 0),
+            SpellSlot(level: 5, max: 0, available: 0),
+            SpellSlot(level: 6, max: 0, available: 0),
+            SpellSlot(level: 7, max: 0, available: 0),
+            SpellSlot(level: 8, max: 0, available: 0),
+            SpellSlot(level: 9, max: 0, available: 0)
+        ],
+        speed: MovementSpeed(walk: 25)
     ),
     Combatent(
         name: "Fighter",
@@ -33,8 +45,9 @@ let testCombatents: [Combatent] = [
         initiative: 14,
         isTurn: false,
         status: nil,
-        spellSlotCount: 0,
-        creatureType: "Half-Orc"
+        creatureType: "Half-Orc",
+        spellSlots: [],
+        speed: MovementSpeed(walk: 30)
     ),
     Combatent(
         name: "Guard Captain",
@@ -43,8 +56,19 @@ let testCombatents: [Combatent] = [
         initiative: 15,
         isTurn: false,
         status: nil,
-        spellSlotCount: 5,
-        creatureType: "Humanoid"
+        creatureType: "Humanoid",
+        spellSlots: [
+            SpellSlot(level: 1, max: 4, available: 4),
+            SpellSlot(level: 2, max: 3, available: 3),
+            SpellSlot(level: 3, max: 0, available: 0),
+            SpellSlot(level: 4, max: 0, available: 0),
+            SpellSlot(level: 5, max: 0, available: 0),
+            SpellSlot(level: 6, max: 0, available: 0),
+            SpellSlot(level: 7, max: 0, available: 0),
+            SpellSlot(level: 8, max: 0, available: 0),
+            SpellSlot(level: 9, max: 0, available: 0)
+        ],
+        speed: MovementSpeed(walk: 30)
     ),
     Combatent(
         name: "Ogre",
@@ -55,8 +79,9 @@ let testCombatents: [Combatent] = [
         status: [
             StatusCondition(name: "Restrained", effect: "Speed 0", desc: "Attack rolls against it have advantage")
         ],
-        spellSlotCount: 0,
-        creatureType: "Giant"
+        creatureType: "Giant",
+        spellSlots: [],
+        speed: MovementSpeed(walk: 40)
     ),
     Combatent(
         name: "Goblin Archer",
@@ -65,8 +90,9 @@ let testCombatents: [Combatent] = [
         initiative: 19,
         isTurn: false,
         status: nil,
-        spellSlotCount: 0,
-        creatureType: "Humanoid"
+        creatureType: "Humanoid",
+        spellSlots: [],
+        speed: MovementSpeed(walk: 30)
     ),
     Combatent(
         name: "Young Wyvern",
@@ -77,7 +103,8 @@ let testCombatents: [Combatent] = [
         status: [
             StatusCondition(name: "Frightened", effect: "Disadvantage", desc: "Cannot move closer to the source of fear")
         ],
-        spellSlotCount: 0,
-        creatureType: "Dragon"
+        creatureType: "Dragon",
+        spellSlots: [],
+        speed: MovementSpeed(walk: 30, fly: 80)
     )
 ]

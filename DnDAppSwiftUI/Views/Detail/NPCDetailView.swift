@@ -30,7 +30,7 @@ struct NPCDetailView: View {
             )
 
             StatusesView(statuses: activeStatuses)
-            SpellSlotsView(slots: npc.spellSlots, encounterSlotCount: encounterCombatent?.spellSlotCount)
+            SpellSlotsView(slots: encounterCombatent?.spellSlots ?? npc.spellSlots)
             AbilityScoresView(scores: npc.abilityScores)
             SpecialAbilitiesView(abilities: npc.specialAbilities)
             ActionsView(actions: npc.actions)

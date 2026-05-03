@@ -2,30 +2,35 @@ import SwiftUI
 
 struct SpellSlotsView: View {
     let slots: [SpellSlot]
-    let encounterSlotCount: Int?
+
+    private var normalizedSlots: [SpellSlot] {
+        slots.normalizedToLevel9()
+    }
 
     var body: some View {
         DetailSection(title: "Spell Slots") {
-            if let encounterSlotCount {
-                HStack {
-                    Text("Remaining")
-                    Spacer()
-                    Text("\(encounterSlotCount)")
-                        .fontWeight(.semibold)
-                }
-                .padding(.vertical, 4)
-            } else if slots.isEmpty {
+            if normalizedSlots.isEmpty || normalizedSlots.allSatisfy({ $0.max == 0 }) {
                 Text("No spell slots")
                     .foregroundStyle(.secondary)
             } else {
-                ForEach(slots, id: \.level) { slot in
-                    HStack {
-                        Text("Level \(slot.level)")
-                        Spacer()
-                        Text("\(slot.count)")
-                            .fontWeight(.semibold)
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(normalizedSlots, id: \.level) { slot in
+                        if slot.max > 0 {
+                            HStack(spacing: 4) {
+                                ForEach(0..<slot.available, id: \.self) { _ in
+                                    Image(systemName: "circle.fill")
+                                        .font(.caption2)
+                                }
+                                let used = slot.max - slot.available
+                                if used > 0 {
+                                    ForEach(0..<used, id: \.self) { _ in
+                                        Image(systemName: "circle")
+                                            .font(.caption2)
+                                    }
+                                }
+                            }
+                        }
                     }
-                    .padding(.vertical, 4)
                 }
             }
         }

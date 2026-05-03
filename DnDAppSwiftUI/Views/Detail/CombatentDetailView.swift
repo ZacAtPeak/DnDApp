@@ -11,12 +11,7 @@ struct CombatentDetailView: View {
                 hpText: "HP \(combatent.currentHP)/\(combatent.maxHP)"
             )
 
-            if combatent.spellSlotCount > 0 {
-                DetailSection(title: "Spell Slots") {
-                    Text("\(combatent.spellSlotCount) remaining")
-                        .foregroundStyle(.secondary)
-                }
-            }
+            SpellSlotsView(slots: combatent.spellSlots)
 
             StatusesView(statuses: combatent.status ?? [])
         }

@@ -40,8 +40,15 @@ struct InitiativeEditorView: View {
                 }
 
                 Section("Spell Slots") {
-                    Stepper(value: $combatent.spellSlotCount, in: 0...99) {
-                        StatValueRow(title: "Remaining Slots", value: combatent.spellSlotCount)
+                    if combatent.spellSlots.isEmpty {
+                        Text("No spell slots")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(combatent.spellSlots.indices, id: \.self) { index in
+                            Stepper(value: $combatent.spellSlots[index].available, in: 0...combatent.spellSlots[index].max) {
+                                StatValueRow(title: "Level \(combatent.spellSlots[index].level)", value: combatent.spellSlots[index].available)
+                            }
+                        }
                     }
                 }
 
