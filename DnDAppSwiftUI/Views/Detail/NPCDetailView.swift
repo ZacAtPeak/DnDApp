@@ -10,6 +10,8 @@ struct NPCDetailView: View {
     var onRollAbility: ((String, Int) -> Void)?
     var onRollSkill: ((String, Int) -> Void)?
     var onCastSpell: ((SpellEntry, Int) -> Void)?
+    var isInTracker: Bool = false
+    var onToggleTracker: (() -> Void)? = nil
 
     private var activeStatuses: [StatusCondition] {
         encounterCombatent?.status ?? npc.status ?? []
@@ -28,7 +30,9 @@ struct NPCDetailView: View {
             DetailHeader(
                 title: npc.name,
                 subtitle: "\(npc.role) - \(npc.size.rawValue), \(npc.alignment.rawValue)",
-                hpText: "HP \(encounterCombatent?.currentHP ?? npc.currentHP)/\(encounterCombatent?.maxHP ?? npc.maxHP)"
+                hpText: "HP \(encounterCombatent?.currentHP ?? npc.currentHP)/\(encounterCombatent?.maxHP ?? npc.maxHP)",
+                isInTracker: isInTracker,
+                onToggleTracker: onToggleTracker
             )
 
             WikiLinkedText(text: npc.biography)

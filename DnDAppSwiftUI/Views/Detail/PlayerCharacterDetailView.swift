@@ -11,6 +11,8 @@ struct PlayerCharacterDetailView: View {
     var onRollSkill: ((String, Int) -> Void)?
     var onCastSpell: ((SpellEntry, Int) -> Void)?
     var onUseAction: ((Attack) -> Void)?
+    var isInTracker: Bool = false
+    var onToggleTracker: (() -> Void)? = nil
 
     private var activeStatuses: [StatusCondition] {
         encounterCombatent?.status ?? player.status ?? []
@@ -35,9 +37,20 @@ struct PlayerCharacterDetailView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 8) {
-                Text(player.name)
-                    .font(.title2)
-                    .fontWeight(.bold)
+                HStack(spacing: 8) {
+                    if let onToggleTracker {
+                        Button(action: onToggleTracker) {
+                            Image(systemName: isInTracker ? "xmark.circle.fill" : "plus.circle")
+                                .foregroundStyle(isInTracker ? .red : .accentColor)
+                                .font(.title3)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    Text(player.name)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                }
 
                 Text("\(player.race) \(player.playerClass) \(player.level)")
                     .font(.headline)

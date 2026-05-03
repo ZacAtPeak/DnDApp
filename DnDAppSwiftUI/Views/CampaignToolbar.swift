@@ -69,6 +69,15 @@ struct CampaignToolbar: ToolbarContent {
             .help("Show roll history")
         }
 
+        ToolbarItem {
+            Button {
+                viewModel.isSettingsPresented.toggle()
+            } label: {
+                Label("Settings", systemImage: "gear")
+            }
+            .help("Settings")
+        }
+
         ToolbarItem(placement: .primaryAction) {
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) {

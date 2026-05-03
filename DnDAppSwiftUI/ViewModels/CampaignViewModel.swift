@@ -33,6 +33,7 @@ final class CampaignViewModel {
     var isSearchPresented = false
     var searchQuery = ""
     var isRollHistoryPresented = false
+    var isSettingsPresented = false
     var rollHistory: [RollEntry] = []
     var hasNewRollHistory = false
     var pendingStatus: StatusCondition?
@@ -544,6 +545,18 @@ final class CampaignViewModel {
     func queueStatus(_ status: StatusCondition) {
         pendingStatus = status
         isStatusPalettePresented = false
+    }
+
+    func isInTracker(sidebarID: String) -> Bool {
+        combatents.contains { $0.sourceSidebarID == sidebarID }
+    }
+
+    func toggleTracker(sidebarID: String) {
+        if let combatent = combatents.first(where: { $0.sourceSidebarID == sidebarID }) {
+            removeCombatent(id: combatent.id)
+        } else {
+            _ = addCombatents(from: [sidebarID])
+        }
     }
 
     func createPlayerCharacter(_ player: PlayerCharacter) {

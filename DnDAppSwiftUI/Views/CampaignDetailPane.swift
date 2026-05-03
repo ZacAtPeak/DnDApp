@@ -10,6 +10,7 @@ struct CampaignDetailPane: View {
                     let entityName = viewModel.selectedPlayer?.name ?? viewModel.selectedMonster?.name ?? viewModel.selectedNPC?.name ?? selectedInitiativeCombatent.name
                     let entityID = viewModel.selectedPlayer?.id ?? viewModel.selectedMonster?.id ?? viewModel.selectedNPC?.id
                     let entityType: InventoryEntityType? = viewModel.selectedPlayer != nil ? .player : viewModel.selectedMonster != nil ? .monster : viewModel.selectedNPC != nil ? .npc : nil
+                    let sidebarID = selectedInitiativeCombatent.sourceSidebarID
                     InitiativeSelectionDetailView(
                         combatent: selectedInitiativeCombatent,
                         player: viewModel.selectedPlayer,
@@ -31,9 +32,16 @@ struct CampaignDetailPane: View {
                             if let entityID, entityType == .player {
                                 viewModel.useAction(action, forEntity: entityID, entityType: .player, name: entityName)
                             }
+                        },
+                        isInTracker: sidebarID.map { viewModel.isInTracker(sidebarID: $0) } ?? false,
+                        onToggleTracker: {
+                            if let sidebarID {
+                                viewModel.toggleTracker(sidebarID: sidebarID)
+                            }
                         }
                     )
                 } else if let selectedPlayer = viewModel.selectedPlayer {
+                    let sidebarID = "player-\(selectedPlayer.id.uuidString)"
                     PlayerCharacterDetailView(
                         player: selectedPlayer,
                         encounterCombatent: nil,
@@ -54,9 +62,14 @@ struct CampaignDetailPane: View {
                         },
                         onUseAction: { action in
                             viewModel.useAction(action, forEntity: selectedPlayer.id, entityType: .player, name: selectedPlayer.name)
+                        },
+                        isInTracker: viewModel.isInTracker(sidebarID: sidebarID),
+                        onToggleTracker: {
+                            viewModel.toggleTracker(sidebarID: sidebarID)
                         }
                     )
                 } else if let selectedMonster = viewModel.selectedMonster {
+                    let sidebarID = "monster-\(selectedMonster.id.uuidString)"
                     MonsterDetailView(
                         monster: selectedMonster,
                         encounterCombatent: nil,
@@ -74,9 +87,14 @@ struct CampaignDetailPane: View {
                         },
                         onCastSpell: { spell, slotLevel in
                             viewModel.castSpell(spell, atLevel: slotLevel, forEntity: selectedMonster.id, entityType: .monster, name: selectedMonster.name)
+                        },
+                        isInTracker: viewModel.isInTracker(sidebarID: sidebarID),
+                        onToggleTracker: {
+                            viewModel.toggleTracker(sidebarID: sidebarID)
                         }
                     )
                 } else if let selectedNPC = viewModel.selectedNPC {
+                    let sidebarID = "character-\(selectedNPC.id.uuidString)"
                     NPCDetailView(
                         npc: selectedNPC,
                         encounterCombatent: nil,
@@ -94,6 +112,10 @@ struct CampaignDetailPane: View {
                         },
                         onCastSpell: { spell, slotLevel in
                             viewModel.castSpell(spell, atLevel: slotLevel, forEntity: selectedNPC.id, entityType: .npc, name: selectedNPC.name)
+                        },
+                        isInTracker: viewModel.isInTracker(sidebarID: sidebarID),
+                        onToggleTracker: {
+                            viewModel.toggleTracker(sidebarID: sidebarID)
                         }
                     )
                 } else if let selectedWikiEntry = viewModel.selectedWikiEntry {

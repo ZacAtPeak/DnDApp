@@ -10,6 +10,8 @@ struct MonsterDetailView: View {
     var onRollAbility: ((String, Int) -> Void)?
     var onRollSkill: ((String, Int) -> Void)?
     var onCastSpell: ((SpellEntry, Int) -> Void)?
+    var isInTracker: Bool = false
+    var onToggleTracker: (() -> Void)? = nil
 
     private var activeStatuses: [StatusCondition] {
         encounterCombatent?.status ?? monster.status ?? []
@@ -28,7 +30,9 @@ struct MonsterDetailView: View {
             DetailHeader(
                 title: monster.name,
                 subtitle: "\(monster.size.rawValue) \(monster.type.rawValue), \(monster.alignment.rawValue)",
-                hpText: "HP \(encounterCombatent?.currentHP ?? monster.currentHP)/\(encounterCombatent?.maxHP ?? monster.maxHP)"
+                hpText: "HP \(encounterCombatent?.currentHP ?? monster.currentHP)/\(encounterCombatent?.maxHP ?? monster.maxHP)",
+                isInTracker: isInTracker,
+                onToggleTracker: onToggleTracker
             )
 
             CreatureSummaryGrid(
