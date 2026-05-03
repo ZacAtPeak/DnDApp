@@ -9,7 +9,7 @@ struct DescriptionRow: View {
             Text(title)
                 .font(.headline)
 
-            Text(detail)
+            WikiLinkedText(text: detail)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -5,6 +5,7 @@ import Observation
 @MainActor
 final class CampaignViewModel {
     var selectedItemID: String? = "players"
+    var wikiEntries: [WikiEntry] = wikiDemoData
     var combatents: [Combatent] = []
     var selectedInitiativeCombatentID: Combatent.ID?
     var isInitiativeTargeted = false
@@ -95,7 +96,20 @@ final class CampaignViewModel {
                 ]
             ),
             SidebarItem(id: "public-assets", title: "Public Assets", systemImage: "globe", children: nil),
-            SidebarItem(id: "private-assets", title: "Private Assets", systemImage: "lock", children: nil)
+            SidebarItem(id: "private-assets", title: "Private Assets", systemImage: "lock", children: nil),
+            SidebarItem(
+                id: "wiki",
+                title: "Wiki",
+                systemImage: "book.pages",
+                children: wikiEntries.map { entry in
+                    SidebarItem(
+                        id: "wiki-\(entry.id)",
+                        title: entry.title,
+                        systemImage: "doc.text",
+                        children: nil
+                    )
+                }
+            )
         ]
     }
 
@@ -113,6 +127,10 @@ final class CampaignViewModel {
 
     var selectedNPC: NPC? {
         dataService.npc(for: selectedItemID)
+    }
+
+    var selectedWikiEntry: WikiEntry? {
+        dataService.wikiEntry(for: selectedItemID)
     }
 
     var editingCombatent: Binding<Combatent>? {

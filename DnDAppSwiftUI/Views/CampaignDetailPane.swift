@@ -19,6 +19,8 @@ struct CampaignDetailPane: View {
                     MonsterDetailView(monster: selectedMonster, encounterCombatent: nil)
                 } else if let selectedNPC = viewModel.selectedNPC {
                     NPCDetailView(npc: selectedNPC, encounterCombatent: nil)
+                } else if let selectedWikiEntry = viewModel.selectedWikiEntry {
+                    WikiDetailView(entry: selectedWikiEntry)
                 } else if let selectedItem = viewModel.selectedSidebarItem {
                     Text(selectedItem.title)
                         .font(.title2)
@@ -31,5 +33,6 @@ struct CampaignDetailPane: View {
             .padding()
             .frame(maxWidth: .infinity, alignment: .topLeading)
         }
+        .environment(\.wikiEntries, viewModel.wikiEntries)
     }
 }

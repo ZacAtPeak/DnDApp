@@ -16,7 +16,7 @@ struct NPCDetailView: View {
                 hpText: "HP \(encounterCombatent?.currentHP ?? npc.currentHP)/\(encounterCombatent?.maxHP ?? npc.maxHP)"
             )
 
-            Text(npc.biography)
+            WikiLinkedText(text: npc.biography)
                 .foregroundStyle(.secondary)
 
             CreatureSummaryGrid(

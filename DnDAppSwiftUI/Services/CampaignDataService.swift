@@ -23,6 +23,12 @@ final class CampaignDataService {
         entity(for: sidebarID, prefix: "character", in: testNPCs)
     }
 
+    func wikiEntry(for sidebarID: String?) -> WikiEntry? {
+        guard let sidebarID, sidebarID.hasPrefix("wiki-") else { return nil }
+        let entryID = String(sidebarID.dropFirst(5))
+        return wikiDemoData.first { $0.id == entryID }
+    }
+
     func sidebarItem(withID id: String?, in items: [SidebarItem]) -> SidebarItem? {
         guard let id else { return nil }
         for item in items {
