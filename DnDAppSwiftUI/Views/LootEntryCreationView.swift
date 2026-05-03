@@ -26,8 +26,8 @@ struct LootEntryCreationView: View {
         enum Kind: String, CaseIterable {
             case acBonus = "AC Bonus"
             case savingThrowBonus = "Saving Throw Bonus"
-            case attackBonus = "Attack Bonus"
-            case damageBonus = "Damage Bonus"
+            case attackBonus = "Atk Bonus"
+            case damageBonus = "Dmg Bonus"
             case setAbilityScore = "Set Ability Score"
         }
 
@@ -61,6 +61,7 @@ struct LootEntryCreationView: View {
                             Text(r).tag(r)
                         }
                     }
+                    .pickerStyle(.menu)
                     if rarity == "Other" {
                         TextField("Custom Rarity", text: $customRarity)
                     }
@@ -176,3 +177,8 @@ struct LootEntryCreationView: View {
         return slug.isEmpty ? "loot" : slug
     }
 }
+
+#Preview {
+    LootEntryCreationView { _ in }
+}
+
