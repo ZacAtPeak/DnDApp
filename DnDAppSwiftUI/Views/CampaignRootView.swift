@@ -76,6 +76,11 @@ struct CampaignRootView: View {
                             viewModel.createWikiEntry(entry)
                         }
                     }
+                    .sheet(isPresented: $viewModel.isLootCreationPresented) {
+                        LootEntryCreationView { item in
+                            viewModel.createLootItem(item)
+                        }
+                    }
                     .inspector(isPresented: $viewModel.isRollHistoryPresented) {
                         RollHistoryInspectorView(viewModel: viewModel)
                     }

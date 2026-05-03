@@ -36,6 +36,9 @@ struct CampaignToolbar: ToolbarContent {
                 Button("Character") {
                     viewModel.isCharacterCreationPresented = true
                 }
+                Button("Loot") {
+                    viewModel.isLootCreationPresented = true
+                }
                 Button("Wiki Entry") {
                     viewModel.isWikiEntryCreationPresented = true
                 }
