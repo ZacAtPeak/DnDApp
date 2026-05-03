@@ -550,6 +550,64 @@ final class CampaignViewModel {
         selectedItemID = "wiki-\(stored.id)"
     }
 
+    // MARK: - Spell Casting
+
+    func castSpell(_ spellEntry: SpellEntry, atLevel slotLevel: Int, forEntity entityID: UUID, entityType: InventoryEntityType, name: String) {
+        // Expend slot
+        if spellEntry.level > 0 {
+            expendSpellSlot(level: slotLevel, for: entityID, entityType: entityType)
+        }
+
+        // Roll damage / healing if applicable
+        if let damageRoll = spellEntry.damageRoll {
+            let result = rollDice(damageRoll)
+            let typeLabel = spellEntry.damageType.map { " \($0.rawValue)" } ?? ""
+            logRoll(
+                type: "Spell",
+                name: "\(name) — \(spellEntry.name) (\(damageRoll)\(typeLabel))",
+                roll: result.rollSum,
+                modifier: result.modifier,
+                total: Double(result.total)
+            )
+        } else {
+            logRoll(
+                type: "Spell",
+                name: "\(name) — \(spellEntry.name)",
+                roll: 0,
+                modifier: 0,
+                total: 0
+            )
+        }
+    }
+
+    private func expendSpellSlot(level: Int, for entityID: UUID, entityType: InventoryEntityType) {
+        // Update entity spell slots
+        switch entityType {
+        case .player:
+            guard let playerIndex = testPlayers.firstIndex(where: { $0.id == entityID }) else { return }
+            guard let slotIndex = testPlayers[playerIndex].spellSlots.firstIndex(where: { $0.level == level && $0.available > 0 }) else { return }
+            testPlayers[playerIndex].spellSlots[slotIndex].available -= 1
+        case .npc:
+            guard let npcIndex = testNPCs.firstIndex(where: { $0.id == entityID }) else { return }
+            guard let slotIndex = testNPCs[npcIndex].spellSlots.firstIndex(where: { $0.level == level && $0.available > 0 }) else { return }
+            testNPCs[npcIndex].spellSlots[slotIndex].available -= 1
+        case .monster:
+            return // Monsters don't have stored spell slots
+        }
+
+        // Update combatent spell slots if present
+        let sidebarID: String
+        switch entityType {
+        case .player:  sidebarID = "player-\(entityID.uuidString)"
+        case .monster: sidebarID = "monster-\(entityID.uuidString)"
+        case .npc:     sidebarID = "character-\(entityID.uuidString)"
+        }
+        if let combatentIndex = combatents.firstIndex(where: { $0.sourceSidebarID == sidebarID }) {
+            guard let slotIndex = combatents[combatentIndex].spellSlots.firstIndex(where: { $0.level == level && $0.available > 0 }) else { return }
+            combatents[combatentIndex].spellSlots[slotIndex].available -= 1
+        }
+    }
+
     // MARK: - Private
 
     private func spellSidebarGroups() -> [SidebarItem] {
@@ -597,4 +655,37 @@ private let statusDragPayloadPrefix = "status:"
 
 func statusDragPayload(for status: StatusCondition) -> String {
     "\(statusDragPayloadPrefix)\(status.name)"
+}
+
+struct DiceRollResult {
+    let rollSum: Int
+    let modifier: Int
+    let total: Int
+}
+
+func rollDice(_ expression: String) -> DiceRollResult {
+    let trimmed = expression.trimmingCharacters(in: .whitespaces)
+    // Parse formats: XdY+Z, XdY-Z, XdY, dY
+    let pattern = try! NSRegularExpression(pattern: "^(\\d+)?d(\\d+)(?:\\s*([+-])\\s*(\\d+))?$", options: .caseInsensitive)
+    let range = NSRange(trimmed.startIndex..., in: trimmed)
+    guard let match = pattern.firstMatch(in: trimmed, options: [], range: range) else {
+        return DiceRollResult(rollSum: 0, modifier: 0, total: 0)
+    }
+
+    let countStr = match.range(at: 1).location != NSNotFound ? String(trimmed[Range(match.range(at: 1), in: trimmed)!]) : nil
+    let dieStr = String(trimmed[Range(match.range(at: 2), in: trimmed)!])
+    let opStr = match.range(at: 3).location != NSNotFound ? String(trimmed[Range(match.range(at: 3), in: trimmed)!]) : nil
+    let modStr = match.range(at: 4).location != NSNotFound ? String(trimmed[Range(match.range(at: 4), in: trimmed)!]) : nil
+
+    let count = countStr.flatMap { Int($0) } ?? 1
+    let die = Int(dieStr) ?? 0
+    let modifier = modStr.flatMap { Int($0) } ?? 0
+    let signedModifier = opStr == "-" ? -modifier : modifier
+
+    var rollSum = 0
+    for _ in 0..<count {
+        rollSum += Int.random(in: 1...max(1, die))
+    }
+
+    return DiceRollResult(rollSum: rollSum, modifier: signedModifier, total: rollSum + signedModifier)
 }

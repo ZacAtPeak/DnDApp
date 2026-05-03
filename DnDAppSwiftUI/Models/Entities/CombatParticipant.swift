@@ -7,6 +7,7 @@ protocol CombatParticipant: Identifiable where ID == UUID {
     var abilityScores: AbilityScores { get }
     var status: [StatusCondition]? { get }
     var spellSlots: [SpellSlot] { get }
+    var knownSpells: [String] { get }
 }
 
 extension Monster: CombatParticipant {

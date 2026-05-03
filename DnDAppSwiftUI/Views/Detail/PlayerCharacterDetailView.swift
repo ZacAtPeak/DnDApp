@@ -5,9 +5,11 @@ struct PlayerCharacterDetailView: View {
     let encounterCombatent: Combatent?
     var inventory: [InventoryItem] = []
     var allLoot: [LootItem] = []
+    var allSpells: [SpellEntry] = spellDemoData
     var onToggleEquip: ((UUID) -> Void)?
     var onRollAbility: ((String, Int) -> Void)?
     var onRollSkill: ((String, Int) -> Void)?
+    var onCastSpell: ((SpellEntry, Int) -> Void)?
 
     private var activeStatuses: [StatusCondition] {
         encounterCombatent?.status ?? player.status ?? []
@@ -58,6 +60,12 @@ struct PlayerCharacterDetailView: View {
 
             StatusesView(statuses: activeStatuses)
             SpellSlotsView(slots: encounterCombatent?.spellSlots ?? player.spellSlots)
+            SpellInventorySection(
+                knownSpellIDs: player.knownSpells,
+                allSpells: allSpells,
+                spellSlots: encounterCombatent?.spellSlots ?? player.spellSlots,
+                onCast: onCastSpell
+            )
             AbilityScoresView(
                 scores: effectiveScores,
                 modifiedAbilities: equippedMods.modifiedAbilityKeys,

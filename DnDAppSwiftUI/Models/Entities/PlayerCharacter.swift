@@ -36,6 +36,7 @@ struct PlayerCharacter: Identifiable {
     var actions: [Attack]
 
     var spellSlots: [SpellSlot]
+    var knownSpells: [String] = []
     var initiative: Double = 0
     var status: [StatusCondition]?
 }

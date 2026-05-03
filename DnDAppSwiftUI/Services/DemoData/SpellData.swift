@@ -11,7 +11,9 @@ let spellDemoData: [SpellEntry] = [
         range: "120 feet",
         components: "V, S",
         duration: "Instantaneous",
-        description: "You hurl a mote of fire at a creature or object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 fire damage. A flammable object hit by this spell ignites if it isn't being worn or carried. The damage increases by 1d10 when you reach 5th level (2d10), 11th level (3d10), and 17th level (4d10)."
+        description: "You hurl a mote of fire at a creature or object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 fire damage. A flammable object hit by this spell ignites if it isn't being worn or carried. The damage increases by 1d10 when you reach 5th level (2d10), 11th level (3d10), and 17th level (4d10).",
+        damageRoll: "2d10",
+        damageType: .fire
     ),
     SpellEntry(
         id: "prestidigitation",
@@ -33,7 +35,9 @@ let spellDemoData: [SpellEntry] = [
         range: "120 feet",
         components: "V, S",
         duration: "Instantaneous",
-        description: "A beam of crackling energy streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 force damage. The spell creates more than one beam when you reach higher levels: two beams at 5th level, three beams at 11th level, and four beams at 17th level. You can direct the beams at the same target or at different ones."
+        description: "A beam of crackling energy streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 force damage. The spell creates more than one beam when you reach higher levels: two beams at 5th level, three beams at 11th level, and four beams at 17th level. You can direct the beams at the same target or at different ones.",
+        damageRoll: "2d10+4",
+        damageType: .force
     ),
 
     // 1st level
@@ -46,7 +50,9 @@ let spellDemoData: [SpellEntry] = [
         range: "120 feet",
         components: "V, S",
         duration: "Instantaneous",
-        description: "You create three glowing darts of magical force. Each dart hits a creature of your choice that you can see within range. A dart deals 1d4 + 1 force damage to its target. The darts all strike simultaneously and can be directed to hit one creature or several. When you cast this spell using a spell slot of 2nd level or higher, the spell creates one more dart for each slot level above 1st."
+        description: "You create three glowing darts of magical force. Each dart hits a creature of your choice that you can see within range. A dart deals 1d4 + 1 force damage to its target. The darts all strike simultaneously and can be directed to hit one creature or several. When you cast this spell using a spell slot of 2nd level or higher, the spell creates one more dart for each slot level above 1st.",
+        damageRoll: "3d4+3",
+        damageType: .force
     ),
     SpellEntry(
         id: "cure-wounds",
@@ -57,7 +63,8 @@ let spellDemoData: [SpellEntry] = [
         range: "Touch",
         components: "V, S",
         duration: "Instantaneous",
-        description: "A creature you touch regains a number of hit points equal to 1d8 + your spellcasting ability modifier. This spell has no effect on undead or constructs. When you cast this spell using a spell slot of 2nd level or higher, the healing increases by 1d8 for each slot level above 1st."
+        description: "A creature you touch regains a number of hit points equal to 1d8 + your spellcasting ability modifier. This spell has no effect on undead or constructs. When you cast this spell using a spell slot of 2nd level or higher, the healing increases by 1d8 for each slot level above 1st.",
+        damageRoll: "1d8"
     ),
     SpellEntry(
         id: "thunderwave",
@@ -68,7 +75,9 @@ let spellDemoData: [SpellEntry] = [
         range: "Self (15-foot cube)",
         components: "V, S",
         duration: "Instantaneous",
-        description: "A wave of thunderous force sweeps out from you. Each creature in a 15-foot cube originating from you must make a Constitution saving throw. On a failed save, a creature takes 2d8 thunder damage and is pushed 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed. The thunderclap can be heard out to 300 feet. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d8 for each slot level above 1st."
+        description: "A wave of thunderous force sweeps out from you. Each creature in a 15-foot cube originating from you must make a Constitution saving throw. On a failed save, a creature takes 2d8 thunder damage and is pushed 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed. The thunderclap can be heard out to 300 feet. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d8 for each slot level above 1st.",
+        damageRoll: "2d8",
+        damageType: .thunder
     ),
 
     // 2nd level
@@ -106,7 +115,9 @@ let spellDemoData: [SpellEntry] = [
         range: "150 feet",
         components: "V, S, M (a tiny ball of bat guano and sulfur)",
         duration: "Instantaneous",
-        description: "A bright streak flashes from your pointing finger to a point you choose within range and then blossoms with a low roar into an explosion of flame. Each creature in a 20-foot-radius sphere centered on that point must make a Dexterity saving throw. A target takes 8d6 fire damage on a failed save, or half as much damage on a successful one. The fire spreads around corners. When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd."
+        description: "A bright streak flashes from your pointing finger to a point you choose within range and then blossoms with a low roar into an explosion of flame. Each creature in a 20-foot-radius sphere centered on that point must make a Dexterity saving throw. A target takes 8d6 fire damage on a failed save, or half as much damage on a successful one. The fire spreads around corners. When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd.",
+        damageRoll: "8d6",
+        damageType: .fire
     ),
     SpellEntry(
         id: "counterspell",
@@ -158,7 +169,9 @@ let spellDemoData: [SpellEntry] = [
         range: "150 feet",
         components: "V, S, M (a bit of fur, a piece of amber or a crystal rod, and three silver pins)",
         duration: "Instantaneous",
-        description: "You create a bolt of lightning that arcs toward a target of your choice that you can see within range. Three bolts then leap from that target to as many as three other targets, each of which must be within 30 feet of the first target. A target can be a creature or an object and can be targeted by only one of the bolts. A target must make a Dexterity saving throw. The target takes 10d8 lightning damage on a failed save, or half as much damage on a successful one. When you cast this spell using a spell slot of 7th level or higher, one additional bolt leaps from the first target to another target for each slot level above 6th."
+        description: "You create a bolt of lightning that arcs toward a target of your choice that you can see within range. Three bolts then leap from that target to as many as three other targets, each of which must be within 30 feet of the first target. A target can be a creature or an object and can be targeted by only one of the bolts. A target must make a Dexterity saving throw. The target takes 10d8 lightning damage on a failed save, or half as much damage on a successful one. When you cast this spell using a spell slot of 7th level or higher, one additional bolt leaps from the first target to another target for each slot level above 6th.",
+        damageRoll: "10d8",
+        damageType: .lightning
     ),
 
     // 7th level

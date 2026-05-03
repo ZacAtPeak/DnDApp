@@ -1,6 +1,6 @@
 import Foundation
 
-let testNPCs: [NPC] = [
+var testNPCs: [NPC] = [
     NPC(
         name: "Captain Alistair",
         role: "Guard Captain",
@@ -115,6 +115,7 @@ let testNPCs: [NPC] = [
             SpellSlot(level: 4, max: 3, available: 2),
             SpellSlot(level: 5, max: 1, available: 0)
         ],
+        knownSpells: ["fire-bolt", "magic-missile", "misty-step", "fireball", "counterspell", "polymorph", "chain-lightning"],
         initiative: 8
     ),
 

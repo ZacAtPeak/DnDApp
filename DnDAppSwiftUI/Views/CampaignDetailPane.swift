@@ -7,18 +7,25 @@ struct CampaignDetailPane: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 if let selectedInitiativeCombatent = viewModel.selectedInitiativeCombatent {
+                    let entityName = viewModel.selectedPlayer?.name ?? viewModel.selectedMonster?.name ?? viewModel.selectedNPC?.name ?? selectedInitiativeCombatent.name
+                    let entityID = viewModel.selectedPlayer?.id ?? viewModel.selectedMonster?.id ?? viewModel.selectedNPC?.id
+                    let entityType: InventoryEntityType? = viewModel.selectedPlayer != nil ? .player : viewModel.selectedMonster != nil ? .monster : viewModel.selectedNPC != nil ? .npc : nil
                     InitiativeSelectionDetailView(
                         combatent: selectedInitiativeCombatent,
                         player: viewModel.selectedPlayer,
                         monster: viewModel.selectedMonster,
                         npc: viewModel.selectedNPC,
+                        allSpells: viewModel.spellEntries,
                         onRollAbility: { name, modifier in
-                            let entityName = viewModel.selectedPlayer?.name ?? viewModel.selectedMonster?.name ?? viewModel.selectedNPC?.name ?? selectedInitiativeCombatent.name
                             viewModel.rollAbilityCheck(name: "\(entityName) — \(name)", modifier: modifier)
                         },
                         onRollSkill: { name, bonus in
-                            let entityName = viewModel.selectedPlayer?.name ?? viewModel.selectedMonster?.name ?? viewModel.selectedNPC?.name ?? selectedInitiativeCombatent.name
                             viewModel.rollSkillCheck(name: "\(entityName) — \(name)", bonus: bonus)
+                        },
+                        onCastSpell: { spell, slotLevel in
+                            if let entityID, let entityType {
+                                viewModel.castSpell(spell, atLevel: slotLevel, forEntity: entityID, entityType: entityType, name: entityName)
+                            }
                         }
                     )
                 } else if let selectedPlayer = viewModel.selectedPlayer {
@@ -27,6 +34,7 @@ struct CampaignDetailPane: View {
                         encounterCombatent: nil,
                         inventory: viewModel.selectedPlayerInventory,
                         allLoot: viewModel.lootItems,
+                        allSpells: viewModel.spellEntries,
                         onToggleEquip: { id in
                             viewModel.toggleEquip(inventoryItemID: id, forEntity: selectedPlayer.id, entityType: .player)
                         },
@@ -35,6 +43,9 @@ struct CampaignDetailPane: View {
                         },
                         onRollSkill: { name, bonus in
                             viewModel.rollSkillCheck(name: "\(selectedPlayer.name) — \(name)", bonus: bonus)
+                        },
+                        onCastSpell: { spell, slotLevel in
+                            viewModel.castSpell(spell, atLevel: slotLevel, forEntity: selectedPlayer.id, entityType: .player, name: selectedPlayer.name)
                         }
                     )
                 } else if let selectedMonster = viewModel.selectedMonster {
@@ -43,6 +54,7 @@ struct CampaignDetailPane: View {
                         encounterCombatent: nil,
                         inventory: viewModel.selectedMonsterInventory,
                         allLoot: viewModel.lootItems,
+                        allSpells: viewModel.spellEntries,
                         onToggleEquip: { id in
                             viewModel.toggleEquip(inventoryItemID: id, forEntity: selectedMonster.id, entityType: .monster)
                         },
@@ -51,6 +63,9 @@ struct CampaignDetailPane: View {
                         },
                         onRollSkill: { name, bonus in
                             viewModel.rollSkillCheck(name: "\(selectedMonster.name) — \(name)", bonus: bonus)
+                        },
+                        onCastSpell: { spell, slotLevel in
+                            viewModel.castSpell(spell, atLevel: slotLevel, forEntity: selectedMonster.id, entityType: .monster, name: selectedMonster.name)
                         }
                     )
                 } else if let selectedNPC = viewModel.selectedNPC {
@@ -59,6 +74,7 @@ struct CampaignDetailPane: View {
                         encounterCombatent: nil,
                         inventory: viewModel.selectedNPCInventory,
                         allLoot: viewModel.lootItems,
+                        allSpells: viewModel.spellEntries,
                         onToggleEquip: { id in
                             viewModel.toggleEquip(inventoryItemID: id, forEntity: selectedNPC.id, entityType: .npc)
                         },
@@ -67,6 +83,9 @@ struct CampaignDetailPane: View {
                         },
                         onRollSkill: { name, bonus in
                             viewModel.rollSkillCheck(name: "\(selectedNPC.name) — \(name)", bonus: bonus)
+                        },
+                        onCastSpell: { spell, slotLevel in
+                            viewModel.castSpell(spell, atLevel: slotLevel, forEntity: selectedNPC.id, entityType: .npc, name: selectedNPC.name)
                         }
                     )
                 } else if let selectedWikiEntry = viewModel.selectedWikiEntry {

@@ -32,6 +32,7 @@ struct NPC: Identifiable {
     var specialAbilities: [SpecialAbility]
     var actions: [Attack]
     var spellSlots: [SpellSlot]
+    var knownSpells: [String] = []
 
     var initiative: Double = 0
     var status: [StatusCondition]?

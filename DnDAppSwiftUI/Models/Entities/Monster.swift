@@ -36,6 +36,7 @@ struct Monster: Identifiable {
     var actions: [Attack]
     var legendaryActions: [LegendaryAction]?
     var legendaryActionCount: Int?
+    var knownSpells: [String] = []
 
     var initiative: Double = 0
     var status: [StatusCondition]?

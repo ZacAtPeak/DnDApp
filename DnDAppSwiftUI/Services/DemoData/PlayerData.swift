@@ -42,6 +42,7 @@ var testPlayers: [PlayerCharacter] = [
             SpellSlot(level: 1, max: 4, available: 2),
             SpellSlot(level: 2, max: 3, available: 2)
         ],
+        knownSpells: ["fire-bolt", "magic-missile", "cure-wounds", "thunderwave", "misty-step"],
         initiative: 12,
         status: [
             StatusCondition(name: "Hasted", effect: "Speed Doubled", desc: "Gain an additional action each turn")
@@ -88,6 +89,7 @@ var testPlayers: [PlayerCharacter] = [
             Attack(name: "Handaxe", hitBonus: 7, reach: "5 ft. or 20/60 ft.", damageRoll: "1d6+4", damageType: .slashing)
         ],
         spellSlots: [],
+        knownSpells: [],
         initiative: 14,
         status: nil
     ),
@@ -135,6 +137,7 @@ var testPlayers: [PlayerCharacter] = [
             SpellSlot(level: 2, max: 2, available: 1),
             SpellSlot(level: 3, max: 2, available: 1)
         ],
+        knownSpells: ["eldritch-blast", "misty-step", "hold-person"],
         initiative: 8,
         status: [
             StatusCondition(name: "Invisible", effect: "Unseen", desc: "Cannot be seen without special senses")
@@ -182,6 +185,7 @@ var testPlayers: [PlayerCharacter] = [
         spellSlots: [
             SpellSlot(level: 1, max: 3, available: 1)
         ],
+        knownSpells: ["cure-wounds"],
         initiative: 10,
         status: [
             StatusCondition(name: "Inspired", effect: "1d8", desc: "Can add inspiration to a roll")
