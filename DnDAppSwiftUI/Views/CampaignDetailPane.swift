@@ -110,5 +110,11 @@ struct CampaignDetailPane: View {
         .environment(\.navigateToWikiEntry) { entry in
             viewModel.selectSidebarItem("wiki-\(entry.id)")
         }
+        .environment(\.navigateToLootItem) { item in
+            viewModel.selectSidebarItem("loot-\(item.id)")
+        }
+        .environment(\.navigateToSpellEntry) { spell in
+            viewModel.selectSidebarItem("spell-\(spell.id)")
+        }
     }
 }

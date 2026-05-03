@@ -10,6 +10,14 @@ private struct WikiNavigationKey: EnvironmentKey {
     static let defaultValue: ((WikiEntry) -> Void)? = nil
 }
 
+private struct LootNavigationKey: EnvironmentKey {
+    static let defaultValue: ((LootItem) -> Void)? = nil
+}
+
+private struct SpellNavigationKey: EnvironmentKey {
+    static let defaultValue: ((SpellEntry) -> Void)? = nil
+}
+
 extension EnvironmentValues {
     var wikiEntries: [WikiEntry] {
         get { self[WikiEntriesKey.self] }
@@ -19,6 +27,16 @@ extension EnvironmentValues {
     var navigateToWikiEntry: ((WikiEntry) -> Void)? {
         get { self[WikiNavigationKey.self] }
         set { self[WikiNavigationKey.self] = newValue }
+    }
+
+    var navigateToLootItem: ((LootItem) -> Void)? {
+        get { self[LootNavigationKey.self] }
+        set { self[LootNavigationKey.self] = newValue }
+    }
+
+    var navigateToSpellEntry: ((SpellEntry) -> Void)? {
+        get { self[SpellNavigationKey.self] }
+        set { self[SpellNavigationKey.self] = newValue }
     }
 }
 

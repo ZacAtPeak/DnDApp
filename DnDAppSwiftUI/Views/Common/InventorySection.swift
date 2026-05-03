@@ -25,12 +25,27 @@ private struct InventoryRow: View {
     let lootItem: LootItem
     var onToggleEquip: ((UUID) -> Void)?
 
+    @State private var isPopoverPresented = false
+    @Environment(\.navigateToLootItem) private var navigateToLootItem
+
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Text(lootItem.name)
                         .font(.system(size: 13, weight: .semibold))
+                        .underline()
+                        .foregroundStyle(.tint)
+                        .onTapGesture(count: 2) {
+                            isPopoverPresented = false
+                            navigateToLootItem?(lootItem)
+                        }
+                        .onTapGesture(count: 1) {
+                            isPopoverPresented = true
+                        }
+                        .popover(isPresented: $isPopoverPresented) {
+                            LootItemPopover(item: lootItem)
+                        }
 
                     if invItem.isEquipped {
                         Text("Equipped")
@@ -85,6 +100,18 @@ private struct InventoryRow: View {
         .padding(.horizontal, 10)
         .background(invItem.isEquipped ? Color.accentColor.opacity(0.07) : Color.secondary.opacity(0.05))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+}
+
+private struct LootItemPopover: View {
+    let item: LootItem
+
+    var body: some View {
+        ScrollView {
+            LootDetailView(item: item)
+                .padding()
+        }
+        .frame(minWidth: 260, idealWidth: 300, maxWidth: 340, minHeight: 120, idealHeight: 200, maxHeight: 400)
     }
 }
 

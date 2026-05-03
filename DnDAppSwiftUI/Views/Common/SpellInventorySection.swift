@@ -40,6 +40,8 @@ private struct SpellRow: View {
     var onCast: ((SpellEntry, Int) -> Void)?
 
     @State private var isPresentingSlotPicker = false
+    @State private var isPopoverPresented = false
+    @Environment(\.navigateToSpellEntry) private var navigateToSpellEntry
 
     private var canCast: Bool {
         if spell.level == 0 { return true }
@@ -56,6 +58,18 @@ private struct SpellRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(spell.name)
                     .font(.system(size: 13, weight: .semibold))
+                    .underline()
+                    .foregroundStyle(.tint)
+                    .onTapGesture(count: 2) {
+                        isPopoverPresented = false
+                        navigateToSpellEntry?(spell)
+                    }
+                    .onTapGesture(count: 1) {
+                        isPopoverPresented = true
+                    }
+                    .popover(isPresented: $isPopoverPresented) {
+                        SpellEntryPopover(spell: spell)
+                    }
 
                 HStack(spacing: 4) {
                     Text(levelText)
@@ -107,6 +121,18 @@ private struct SpellRow: View {
         .padding(.horizontal, 10)
         .background(Color.secondary.opacity(0.05))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+}
+
+private struct SpellEntryPopover: View {
+    let spell: SpellEntry
+
+    var body: some View {
+        ScrollView {
+            SpellDetailView(spell: spell)
+                .padding()
+        }
+        .frame(minWidth: 260, idealWidth: 300, maxWidth: 340, minHeight: 120, idealHeight: 200, maxHeight: 400)
     }
 }
 
