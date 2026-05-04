@@ -1,6 +1,6 @@
 import Foundation
 
-let testMonsters: [Monster] = [
+var testMonsters: [Monster] = [
     Monster(
         name: "Goblin",
         size: .small,

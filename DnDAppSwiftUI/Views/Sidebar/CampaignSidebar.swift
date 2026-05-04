@@ -14,7 +14,7 @@ struct CampaignSidebar: View {
 
     var body: some View {
         List(selection: sidebarSelection) {
-            ForEach(viewModel.sidebarItems) { item in
+            ForEach(viewModel.sidebarItems(dataVersion: dataVersion)) { item in
                 SidebarRow(item: item, expandedIDs: $expandedIDs, viewModel: viewModel)
             }
         }

@@ -24,6 +24,7 @@ final class CampaignViewModel {
     var isSettingsPresented = false
     var hasNewRollHistory = false
     var pendingStatus: StatusCondition?
+    var dataVersion = 0
 
     // MARK: - Live data
 
@@ -50,11 +51,11 @@ final class CampaignViewModel {
         seedDemoEncounters()
     }
 
-    private func seedDemoEncounters() {
-        let monsterIDs = testMonsters
+    func seedDemoEncounters() {
+        let monsterIDs = DemoDataStore.monsters
             .filter { ["Goblin", "Orc", "Skeleton", "Zombie", "Owlbear"].contains($0.name) }
             .map { "monster-\($0.id.uuidString)" }
-        let playerIDs = testPlayers.map { "player-\($0.id.uuidString)" }
+        let playerIDs = DemoDataStore.players.map { "player-\($0.id.uuidString)" }
         encounters.append(
             Encounter(name: "Ambush at the Crossroads", memberSidebarIDs: playerIDs + monsterIDs)
         )
@@ -62,45 +63,45 @@ final class CampaignViewModel {
 
     /// Seeds the per-entity inventories with the demo loadouts shown in the
     /// initial app state. Pulled out of `init` so the constructor stays tiny.
-    private func seedDemoInventories() {
+    func seedDemoInventories() {
         // Wizard (index 0): ring of protection equipped, bag of holding in pack
-        if testPlayers.count > 0 {
-            playerInventories[testPlayers[0].id] = [
+        if DemoDataStore.players.count > 0 {
+            playerInventories[DemoDataStore.players[0].id] = [
                 InventoryItem(lootItemID: "ring-of-protection", isEquipped: true),
                 InventoryItem(lootItemID: "bag-of-holding")
             ]
         }
         // Barbarian (index 1): gauntlets equipped, potion in pack
-        if testPlayers.count > 1 {
-            playerInventories[testPlayers[1].id] = [
+        if DemoDataStore.players.count > 1 {
+            playerInventories[DemoDataStore.players[1].id] = [
                 InventoryItem(lootItemID: "gauntlets-of-ogre-power", isEquipped: true),
                 InventoryItem(lootItemID: "potion-of-healing")
             ]
         }
         // Warlock (index 2): cloak and staff in pack
-        if testPlayers.count > 2 {
-            playerInventories[testPlayers[2].id] = [
+        if DemoDataStore.players.count > 2 {
+            playerInventories[DemoDataStore.players[2].id] = [
                 InventoryItem(lootItemID: "cloak-of-elvenkind"),
                 InventoryItem(lootItemID: "staff-of-the-python")
             ]
         }
         // Paladin (index 3): dwarven thrower equipped, amulet of health equipped
-        if testPlayers.count > 3 {
-            playerInventories[testPlayers[3].id] = [
+        if DemoDataStore.players.count > 3 {
+            playerInventories[DemoDataStore.players[3].id] = [
                 InventoryItem(lootItemID: "dwarven-thrower", isEquipped: true),
                 InventoryItem(lootItemID: "amulet-of-health", isEquipped: true)
             ]
         }
         // Guard Captain NPC (index 0): sword of vengeance equipped
-        if testNPCs.count > 0 {
-            npcInventories[testNPCs[0].id] = [
+        if DemoDataStore.npcs.count > 0 {
+            npcInventories[DemoDataStore.npcs[0].id] = [
                 InventoryItem(lootItemID: "sword-of-vengeance", isEquipped: true),
                 InventoryItem(lootItemID: "ring-of-protection")
             ]
         }
         // Archmage NPC (index 2): staff equipped, deck of illusions in pack
-        if testNPCs.count > 2 {
-            npcInventories[testNPCs[2].id] = [
+        if DemoDataStore.npcs.count > 2 {
+            npcInventories[DemoDataStore.npcs[2].id] = [
                 InventoryItem(lootItemID: "staff-of-the-python", isEquipped: true),
                 InventoryItem(lootItemID: "deck-of-illusions")
             ]

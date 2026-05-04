@@ -89,6 +89,9 @@ struct CampaignRootView: View {
                     .inspector(isPresented: $viewModel.isRollHistoryPresented) {
                         RollHistoryInspectorView(viewModel: viewModel)
                     }
+                    .sheet(isPresented: $viewModel.isSettingsPresented) {
+                        SettingsView(viewModel: viewModel)
+                    }
                 }
             }
 

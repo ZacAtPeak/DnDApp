@@ -3,8 +3,10 @@ import SwiftUI
 // MARK: - Sidebar tree & entity selection
 
 extension CampaignViewModel {
-    var sidebarItems: [SidebarItem] {
-        [
+    func sidebarItems(dataVersion: Int) -> [SidebarItem] {
+        // Read dataVersion to establish an explicit observation dependency.
+        _ = dataVersion
+        return [
             SidebarItem(
                 id: "players",
                 title: "Players",
@@ -141,7 +143,7 @@ extension CampaignViewModel {
     }
 
     var selectedSidebarItem: SidebarItem? {
-        dataService.sidebarItem(withID: selectedItemID, in: sidebarItems)
+        dataService.sidebarItem(withID: selectedItemID, in: sidebarItems(dataVersion: dataVersion))
     }
 
     var selectedPlayer: PlayerCharacter? {
