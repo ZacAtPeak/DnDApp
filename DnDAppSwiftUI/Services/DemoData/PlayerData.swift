@@ -42,7 +42,7 @@ var testPlayers: [PlayerCharacter] = [
             SpellSlot(level: 1, max: 4, available: 2),
             SpellSlot(level: 2, max: 3, available: 2)
         ],
-        knownSpells: ["fire-bolt", "magic-missile", "cure-wounds", "thunderwave", "misty-step"],
+        knownSpells: ["fire-bolt", "prestidigitation", "magic-missile", "cure-wounds", "thunderwave", "mage-armor", "shield", "burning-hands", "misty-step"],
         initiative: 12,
         status: [
             StatusCondition(name: "Hasted", effect: "Speed Doubled", desc: "Gain an additional action each turn")
@@ -137,7 +137,7 @@ var testPlayers: [PlayerCharacter] = [
             SpellSlot(level: 2, max: 2, available: 1),
             SpellSlot(level: 3, max: 2, available: 1)
         ],
-        knownSpells: ["eldritch-blast", "misty-step", "hold-person"],
+        knownSpells: ["eldritch-blast", "misty-step", "hold-person", "hunger-of-hadar", "hypnotic-pattern", "counterspell", "fireball"],
         initiative: 8,
         status: [
             StatusCondition(name: "Invisible", effect: "Unseen", desc: "Cannot be seen without special senses")
@@ -180,12 +180,12 @@ var testPlayers: [PlayerCharacter] = [
         ],
         actions: [
             Attack(name: "Longsword", hitBonus: 5, reach: "5 ft.", damageRoll: "1d8+3", damageType: .slashing, description: "Versatile: 1d10+3."),
-            Attack(name: "Shield Bash", hitBonus: 5, reach: "5 ft.", damageRoll: "1d4+3", damageType: .bludgeoning, description: "DC 13 STR save or target is knocked prone.", maxUses: 3, remainingUses: 3)
+            Attack(name: "Shield Bash", hitBonus: 5, reach: "5 ft.", damageRoll: "1d4+3", damageType: .bludgeoning, saveDC: 13, description: "DC 13 STR save or target is knocked prone.", maxUses: 3, remainingUses: 3)
         ],
         spellSlots: [
             SpellSlot(level: 1, max: 3, available: 1)
         ],
-        knownSpells: ["cure-wounds"],
+        knownSpells: ["bless", "cure-wounds", "shield-of-faith", "wrathful-smite"],
         initiative: 10,
         status: [
             StatusCondition(name: "Inspired", effect: "1d8", desc: "Can add inspiration to a roll")

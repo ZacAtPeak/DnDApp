@@ -14,4 +14,5 @@ struct SpellEntry: Identifiable {
     var ritual: Bool = false
     var damageRoll: String? = nil
     var damageType: DamageType? = nil
+    var saveDC: Int? = nil
 }

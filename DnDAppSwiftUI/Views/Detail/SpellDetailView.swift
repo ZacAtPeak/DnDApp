@@ -44,6 +44,9 @@ struct SpellDetailView: View {
                 SpellStatRow(label: "Range", value: spell.range)
                 SpellStatRow(label: "Components", value: spell.components)
                 SpellStatRow(label: "Duration", value: spell.duration)
+                if let dc = spell.saveDC {
+                    SpellStatRow(label: "Save DC", value: "\(dc)")
+                }
             }
 
             Divider()

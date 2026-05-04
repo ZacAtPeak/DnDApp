@@ -4,6 +4,17 @@ struct ActionsView: View {
     let actions: [Attack]
     var onUseAction: ((Attack) -> Void)?
 
+    private func makeActionStatsText(_ action: Attack) -> String {
+        var parts: [String] = []
+        parts.append("+\(action.hitBonus) to hit")
+        if let dc = action.saveDC {
+            parts.append("DC \(dc) save")
+        }
+        parts.append(action.reach)
+        parts.append("\(action.damageRoll) \(action.damageType.rawValue)")
+        return parts.joined(separator: ", ")
+    }
+
     var body: some View {
         DetailSection(title: "Actions") {
             if actions.isEmpty {
@@ -17,7 +28,7 @@ struct ActionsView: View {
                                 .font(.headline)
 
                             WikiLinkedText(
-                                text: "+\(action.hitBonus) to hit, \(action.reach), \(action.damageRoll) \(action.damageType.rawValue)"
+                                text: makeActionStatsText(action)
                             )
                             .foregroundStyle(.secondary)
 

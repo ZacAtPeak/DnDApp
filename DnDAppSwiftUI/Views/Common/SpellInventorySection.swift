@@ -81,6 +81,14 @@ private struct SpellRow: View {
                     Text(spell.school)
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
+                    if let dc = spell.saveDC {
+                        Text("·")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary.opacity(0.5))
+                        Text("DC \(dc)")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
 

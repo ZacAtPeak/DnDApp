@@ -256,6 +256,7 @@ let testMonsters: [Monster] = [
                 reach: "5 ft.",
                 damageRoll: "6d6",
                 damageType: .acid,
+                saveDC: 12,
                 description: "DC 12 DEX save or be engulfed. Engulfed creatures are restrained and blinded, take 6d6 acid damage at the start of each of the cube's turns."
             )
         ],

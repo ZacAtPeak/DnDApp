@@ -7,6 +7,7 @@ struct Attack: Identifiable {
     var reach: String
     var damageRoll: String
     var damageType: DamageType
+    var saveDC: Int? = nil
     var description: String?
     var maxUses: Int? = nil
     var remainingUses: Int? = nil
