@@ -13,6 +13,16 @@ struct RollHistoryInspectorView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Button {
+                    viewModel.saveRollHistory()
+                } label: {
+                    Image(systemName: "square.and.arrow.down")
+                        .font(.system(size: 13, weight: .medium))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(viewModel.rollHistory.isEmpty ? Color.secondary.opacity(0.3) : Color.accentColor)
+                .disabled(viewModel.rollHistory.isEmpty)
+
+                Button {
                     viewModel.clearRollHistory()
                 } label: {
                     Image(systemName: "trash")

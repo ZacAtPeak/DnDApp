@@ -1,6 +1,6 @@
 import Foundation
 
-struct RollEntry: Identifiable {
+struct RollEntry: Identifiable, Codable {
     let id = UUID()
     let type: String
     let name: String
