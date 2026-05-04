@@ -8,6 +8,18 @@ extension CampaignViewModel {
         return combatents.first { $0.id == selectedInitiativeCombatentID }
     }
 
+    var combatentLinkedPlayer: PlayerCharacter? {
+        dataService.player(for: selectedInitiativeCombatent?.sourceSidebarID)
+    }
+
+    var combatentLinkedMonster: Monster? {
+        dataService.monster(for: selectedInitiativeCombatent?.sourceSidebarID)
+    }
+
+    var combatentLinkedNPC: NPC? {
+        dataService.npc(for: selectedInitiativeCombatent?.sourceSidebarID)
+    }
+
     var editingCombatent: Binding<Combatent>? {
         guard let editingCombatentID else { return nil }
         return Binding {

@@ -45,8 +45,12 @@ struct CampaignToolbar: ToolbarContent {
                 Button("Wiki Entry") {
                     viewModel.isWikiEntryCreationPresented = true
                 }
-                Button("Private Asset") {}
-                Button("Public Asset") {}
+                Button("Private Asset") {
+                    viewModel.isPrivateAssetCreationPresented = true
+                }
+                Button("Public Asset") {
+                    viewModel.isPublicAssetCreationPresented = true
+                }
             } label: {
                 Image(systemName: "plus")
             }

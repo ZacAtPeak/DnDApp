@@ -28,9 +28,6 @@ extension CampaignViewModel {
 
     func selectOrAssignStatus(to combatent: Combatent) {
         selectedInitiativeCombatentID = combatent.id
-        if let sourceSidebarID = combatent.sourceSidebarID {
-            selectedItemID = sourceSidebarID
-        }
         guard let pendingStatus else { return }
         assignStatus(pendingStatus, to: combatent.id)
         self.pendingStatus = nil

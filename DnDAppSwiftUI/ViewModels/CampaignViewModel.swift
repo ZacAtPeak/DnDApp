@@ -18,6 +18,8 @@ final class CampaignViewModel {
     var isWikiEntryCreationPresented = false
     var isLootCreationPresented = false
     var isEncounterCreationPresented = false
+    var isPublicAssetCreationPresented = false
+    var isPrivateAssetCreationPresented = false
     var isSearchPresented = false
     var searchQuery = ""
     var isRollHistoryPresented = false

@@ -48,13 +48,11 @@ private struct SidebarRow: View {
                     Spacer()
                 }
                 .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    viewModel.selectSidebarItem(item.id)
+                })
             }
             .draggable(item.id)
-            .simultaneousGesture(
-                TapGesture(count: 2).onEnded {
-                    isExpanded.wrappedValue.toggle()
-                }
-            )
             .modifier(EncounterContextMenuModifier(itemID: item.id, viewModel: viewModel))
         } else {
             HStack {
@@ -62,6 +60,9 @@ private struct SidebarRow: View {
                 Spacer()
             }
             .contentShape(Rectangle())
+            .simultaneousGesture(TapGesture().onEnded {
+                viewModel.selectSidebarItem(item.id)
+            })
             .draggable(item.id)
             .modifier(EncounterContextMenuModifier(itemID: item.id, viewModel: viewModel))
         }

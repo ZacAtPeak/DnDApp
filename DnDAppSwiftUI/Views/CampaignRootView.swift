@@ -86,6 +86,16 @@ struct CampaignRootView: View {
                             viewModel.createEncounter(name: name)
                         }
                     }
+                    .sheet(isPresented: $viewModel.isPublicAssetCreationPresented) {
+                        AssetCreationView(isPublic: true) { asset in
+                            viewModel.createAsset(asset)
+                        }
+                    }
+                    .sheet(isPresented: $viewModel.isPrivateAssetCreationPresented) {
+                        AssetCreationView(isPublic: false) { asset in
+                            viewModel.createAsset(asset)
+                        }
+                    }
                     .inspector(isPresented: $viewModel.isRollHistoryPresented) {
                         RollHistoryInspectorView(viewModel: viewModel)
                     }

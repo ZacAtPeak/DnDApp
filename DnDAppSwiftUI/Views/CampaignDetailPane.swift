@@ -7,15 +7,18 @@ struct CampaignDetailPane: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 if let selectedInitiativeCombatent = viewModel.selectedInitiativeCombatent {
-                    let entityName = viewModel.selectedPlayer?.name ?? viewModel.selectedMonster?.name ?? viewModel.selectedNPC?.name ?? selectedInitiativeCombatent.name
-                    let entityID = viewModel.selectedPlayer?.id ?? viewModel.selectedMonster?.id ?? viewModel.selectedNPC?.id
-                    let entityType: InventoryEntityType? = viewModel.selectedPlayer != nil ? .player : viewModel.selectedMonster != nil ? .monster : viewModel.selectedNPC != nil ? .npc : nil
+                    let linkedPlayer = viewModel.combatentLinkedPlayer
+                    let linkedMonster = viewModel.combatentLinkedMonster
+                    let linkedNPC = viewModel.combatentLinkedNPC
+                    let entityName = linkedPlayer?.name ?? linkedMonster?.name ?? linkedNPC?.name ?? selectedInitiativeCombatent.name
+                    let entityID = linkedPlayer?.id ?? linkedMonster?.id ?? linkedNPC?.id
+                    let entityType: InventoryEntityType? = linkedPlayer != nil ? .player : linkedMonster != nil ? .monster : linkedNPC != nil ? .npc : nil
                     let sidebarID = selectedInitiativeCombatent.sourceSidebarID
                     InitiativeSelectionDetailView(
                         combatent: selectedInitiativeCombatent,
-                        player: viewModel.selectedPlayer,
-                        monster: viewModel.selectedMonster,
-                        npc: viewModel.selectedNPC,
+                        player: linkedPlayer,
+                        monster: linkedMonster,
+                        npc: linkedNPC,
                         allSpells: viewModel.spellEntries,
                         onRollAbility: { name, modifier in
                             viewModel.rollAbilityCheck(name: "\(entityName) — \(name)", modifier: modifier)

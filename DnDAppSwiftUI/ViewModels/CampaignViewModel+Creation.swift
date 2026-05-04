@@ -66,4 +66,31 @@ extension CampaignViewModel {
         guard let index = encounters.firstIndex(where: { $0.id == encounterID }) else { return }
         encounters[index].memberSidebarIDs.removeAll { $0 == memberSidebarID }
     }
+
+    func createAsset(_ asset: Asset) {
+        var id = asset.id
+        var suffix = 2
+        while assets.contains(where: { $0.id == id }) {
+            id = "\(asset.id)-\(suffix)"
+            suffix += 1
+        }
+        let stored: Asset
+        if id == asset.id {
+            stored = asset
+        } else {
+            stored = Asset(
+                id: id,
+                name: asset.name,
+                type: asset.type,
+                description: asset.description,
+                isPublic: asset.isPublic,
+                location: asset.location,
+                difficulty: asset.difficulty,
+                rewards: asset.rewards
+            )
+        }
+        assets.append(stored)
+        let prefix = asset.isPublic ? "asset-public" : "asset-private"
+        selectedItemID = "\(prefix)-\(stored.id)"
+    }
 }
