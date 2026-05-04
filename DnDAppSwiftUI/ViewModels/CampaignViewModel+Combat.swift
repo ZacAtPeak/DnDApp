@@ -26,7 +26,11 @@ extension CampaignViewModel {
             guard let playerIndex = testPlayers.firstIndex(where: { $0.id == entityID }) else { return }
             guard let actionIndex = testPlayers[playerIndex].actions.firstIndex(where: { $0.id == action.id }) else { return }
             testPlayers[playerIndex].actions[actionIndex] = mutableAction
-        case .monster, .npc:
+        case .npc:
+            guard let npcIndex = testNPCs.firstIndex(where: { $0.id == entityID }) else { return }
+            guard let actionIndex = testNPCs[npcIndex].actions.firstIndex(where: { $0.id == action.id }) else { return }
+            testNPCs[npcIndex].actions[actionIndex] = mutableAction
+        case .monster:
             break
         }
     }
@@ -77,6 +81,18 @@ extension CampaignViewModel {
             for actionIndex in testPlayers[index].actions.indices {
                 if let maxUses = testPlayers[index].actions[actionIndex].maxUses {
                     testPlayers[index].actions[actionIndex].remainingUses = maxUses
+                }
+            }
+        }
+        for index in testNPCs.indices {
+            testNPCs[index].currentHP = testNPCs[index].maxHP
+            testNPCs[index].status = nil
+            for slotIndex in testNPCs[index].spellSlots.indices {
+                testNPCs[index].spellSlots[slotIndex].available = testNPCs[index].spellSlots[slotIndex].max
+            }
+            for actionIndex in testNPCs[index].actions.indices {
+                if let maxUses = testNPCs[index].actions[actionIndex].maxUses {
+                    testNPCs[index].actions[actionIndex].remainingUses = maxUses
                 }
             }
         }

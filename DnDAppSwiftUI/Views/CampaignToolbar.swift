@@ -36,6 +36,9 @@ struct CampaignToolbar: ToolbarContent {
                 Button("Character") {
                     viewModel.isCharacterCreationPresented = true
                 }
+                Button("Encounter") {
+                    viewModel.isEncounterCreationPresented = true
+                }
                 Button("Loot") {
                     viewModel.isLootCreationPresented = true
                 }

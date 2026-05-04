@@ -10,6 +10,7 @@ struct NPCDetailView: View {
     var onRollAbility: ((String, Int) -> Void)?
     var onRollSkill: ((String, Int) -> Void)?
     var onCastSpell: ((SpellEntry, Int) -> Void)?
+    var onUseAction: ((Attack) -> Void)?
     var isInTracker: Bool = false
     var onToggleTracker: (() -> Void)? = nil
 
@@ -64,7 +65,7 @@ struct NPCDetailView: View {
             )
             SkillsView(skills: npc.skills, onRoll: onRollSkill)
             SpecialAbilitiesView(abilities: npc.specialAbilities)
-            ActionsView(actions: npc.actions)
+            ActionsView(actions: npc.actions, onUseAction: onUseAction)
             InventorySection(inventory: inventory, allLoot: allLoot, onToggleEquip: onToggleEquip)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)

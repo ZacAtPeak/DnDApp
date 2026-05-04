@@ -17,6 +17,7 @@ final class CampaignViewModel {
     var isCharacterCreationPresented = false
     var isWikiEntryCreationPresented = false
     var isLootCreationPresented = false
+    var isEncounterCreationPresented = false
     var isSearchPresented = false
     var searchQuery = ""
     var isRollHistoryPresented = false
@@ -29,6 +30,8 @@ final class CampaignViewModel {
     var wikiEntries: [WikiEntry] = wikiDemoData
     var lootItems: [LootItem] = lootDemoData
     var spellEntries: [SpellEntry] = spellDemoData
+    var assets: [Asset] = assetDemoData
+    var encounters: [Encounter] = []
     var playerInventories: [UUID: [InventoryItem]] = [:]
     var monsterInventories: [UUID: [InventoryItem]] = [:]
     var npcInventories: [UUID: [InventoryItem]] = [:]
@@ -44,6 +47,17 @@ final class CampaignViewModel {
     init(dataService: CampaignDataService) {
         self.dataService = dataService
         seedDemoInventories()
+        seedDemoEncounters()
+    }
+
+    private func seedDemoEncounters() {
+        let monsterIDs = testMonsters
+            .filter { ["Goblin", "Orc", "Skeleton", "Zombie", "Owlbear"].contains($0.name) }
+            .map { "monster-\($0.id.uuidString)" }
+        let playerIDs = testPlayers.map { "player-\($0.id.uuidString)" }
+        encounters.append(
+            Encounter(name: "Ambush at the Crossroads", memberSidebarIDs: playerIDs + monsterIDs)
+        )
     }
 
     /// Seeds the per-entity inventories with the demo loadouts shown in the

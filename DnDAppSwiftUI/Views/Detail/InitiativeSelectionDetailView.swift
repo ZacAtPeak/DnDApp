@@ -45,6 +45,7 @@ struct InitiativeSelectionDetailView: View {
                 onRollAbility: onRollAbility,
                 onRollSkill: onRollSkill,
                 onCastSpell: onCastSpell,
+                onUseAction: onUseAction,
                 isInTracker: isInTracker,
                 onToggleTracker: onToggleTracker
             )

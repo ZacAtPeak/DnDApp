@@ -94,7 +94,7 @@ struct InitiativeTrackerStrip: View {
     }
 
     private var emptyState: some View {
-        Text("Drag characters here to add them to initiative")
+        Text("Drag characters or encounters here to add them to initiative")
             .foregroundStyle(.secondary)
             .font(.subheadline)
             .frame(minWidth: 300)

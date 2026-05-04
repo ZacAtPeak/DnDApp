@@ -5,6 +5,7 @@ struct RollHistoryInspectorView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            // Header
             HStack {
                 Text("Roll History")
                     .font(.headline)
@@ -34,14 +35,16 @@ struct RollHistoryInspectorView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
+            .background(.bar)
 
             Divider()
+                .opacity(0.4)
 
             if viewModel.rollHistory.isEmpty {
                 VStack(spacing: 8) {
                     Image(systemName: "dice")
                         .font(.system(size: 32))
-                        .foregroundStyle(.secondary.opacity(0.5))
+                        .foregroundStyle(.secondary.opacity(0.4))
                     Text("No rolls yet")
                         .font(.callout)
                         .foregroundStyle(.secondary)
@@ -49,17 +52,18 @@ struct RollHistoryInspectorView: View {
                 .frame(maxHeight: .infinity)
             } else {
                 ScrollViewReader { proxy in
-                    List {
-                        ForEach(viewModel.rollHistory) { entry in
-                            RollHistoryRow(entry: entry)
-                                .listRowSeparator(.hidden)
-                                .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
+                    ScrollView {
+                        LazyVStack(spacing: 6) {
+                            ForEach(viewModel.rollHistory) { entry in
+                                RollHistoryRow(entry: entry)
+                            }
+                            Color.clear
+                                .frame(height: 1)
+                                .id("bottom")
                         }
-                        Color.clear
-                            .frame(height: 1)
-                            .id("bottom")
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
                     }
-                    .listStyle(.plain)
                     .onChange(of: viewModel.rollHistory.count) {
                         withAnimation {
                             proxy.scrollTo("bottom")
@@ -74,6 +78,14 @@ struct RollHistoryInspectorView: View {
 
 private struct RollHistoryRow: View {
     let entry: RollEntry
+
+    private var totalColor: Color {
+        let t = Int(entry.total)
+        if t >= 20 { return .yellow }
+        if t >= 15 { return .green }
+        if t <= 4  { return .red }
+        return .primary
+    }
 
     var body: some View {
         HStack(spacing: 10) {
@@ -99,25 +111,39 @@ private struct RollHistoryRow: View {
 
             Spacer(minLength: 8)
 
-            HStack(spacing: 4) {
-                Text("\(entry.roll)")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.secondary)
-
-                if entry.modifier != 0 {
+            // Roll + modifier
+            if entry.modifier != 0 {
+                HStack(spacing: 2) {
+                    Text("\(entry.roll)")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.secondary)
                     Text(entry.modifier >= 0 ? "+\(entry.modifier)" : "\(entry.modifier)")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(entry.modifier >= 0 ? .green : .red)
                 }
             }
 
+            // Total badge
             Text("\(Int(entry.total))")
-                .font(.system(size: 15, weight: .bold, design: .rounded))
-                .frame(minWidth: 28, alignment: .trailing)
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .foregroundStyle(totalColor)
+                .frame(minWidth: 30)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(.thinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(totalColor.opacity(0.25), lineWidth: 1)
+                }
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 8)
-        .background(Color.secondary.opacity(0.06))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .padding(.vertical, 8)
+        .padding(.horizontal, 10)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color.primary.opacity(0.07), lineWidth: 1)
+        }
     }
 }

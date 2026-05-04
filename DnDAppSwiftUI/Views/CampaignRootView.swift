@@ -81,6 +81,11 @@ struct CampaignRootView: View {
                             viewModel.createLootItem(item)
                         }
                     }
+                    .sheet(isPresented: $viewModel.isEncounterCreationPresented) {
+                        EncounterCreationView { name in
+                            viewModel.createEncounter(name: name)
+                        }
+                    }
                     .inspector(isPresented: $viewModel.isRollHistoryPresented) {
                         RollHistoryInspectorView(viewModel: viewModel)
                     }

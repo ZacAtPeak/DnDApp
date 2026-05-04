@@ -46,4 +46,24 @@ extension CampaignViewModel {
         lootItems.append(stored)
         selectedItemID = "loot-\(stored.id)"
     }
+
+    func createEncounter(name: String) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        let encounter = Encounter(name: trimmed)
+        encounters.append(encounter)
+        selectedItemID = "encounter-\(encounter.id.uuidString)"
+    }
+
+    func deleteEncounter(id: UUID) {
+        encounters.removeAll { $0.id == id }
+        if selectedItemID == "encounter-\(id.uuidString)" {
+            selectedItemID = nil
+        }
+    }
+
+    func removeMemberFromEncounter(encounterID: UUID, memberSidebarID: String) {
+        guard let index = encounters.firstIndex(where: { $0.id == encounterID }) else { return }
+        encounters[index].memberSidebarIDs.removeAll { $0 == memberSidebarID }
+    }
 }

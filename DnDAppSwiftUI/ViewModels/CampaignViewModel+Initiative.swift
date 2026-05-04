@@ -29,8 +29,9 @@ extension CampaignViewModel {
     }
 
     func addCombatents(from sidebarIDs: [String]) -> Bool {
+        let expanded = sidebarIDs.flatMap { expandEncounter(sidebarID: $0) }
         var added: [Combatent] = []
-        for id in sidebarIDs {
+        for id in expanded {
             if id.hasPrefix("player-") {
                 let existsInTracker = combatents.contains { $0.sourceSidebarID == id }
                 let existsInAdded = added.contains { $0.sourceSidebarID == id }
@@ -122,6 +123,25 @@ extension CampaignViewModel {
 
     func isInTracker(sidebarID: String) -> Bool {
         combatents.contains { $0.sourceSidebarID == sidebarID }
+    }
+
+    private func expandEncounter(sidebarID: String) -> [String] {
+        let prefix = "encounter-"
+        guard sidebarID.hasPrefix(prefix) else { return [sidebarID] }
+
+        // Encounter member: encounter-<uuid>-member-<memberID>
+        if let memberRange = sidebarID.range(of: "-member-") {
+            let memberID = String(sidebarID[memberRange.upperBound...])
+            return [memberID]
+        }
+
+        // Encounter folder: encounter-<uuid>
+        if let uuid = UUID(uuidString: String(sidebarID.dropFirst(prefix.count))),
+           let encounter = encounters.first(where: { $0.id == uuid }) {
+            return encounter.memberSidebarIDs
+        }
+
+        return [sidebarID]
     }
 
     func toggleTracker(sidebarID: String) {

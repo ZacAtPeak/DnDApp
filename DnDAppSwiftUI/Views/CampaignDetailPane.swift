@@ -29,8 +29,8 @@ struct CampaignDetailPane: View {
                             }
                         },
                         onUseAction: { action in
-                            if let entityID, entityType == .player {
-                                viewModel.useAction(action, forEntity: entityID, entityType: .player, name: entityName)
+                            if let entityID, let entityType {
+                                viewModel.useAction(action, forEntity: entityID, entityType: entityType, name: entityName)
                             }
                         },
                         isInTracker: sidebarID.map { viewModel.isInTracker(sidebarID: $0) } ?? false,
@@ -113,6 +113,9 @@ struct CampaignDetailPane: View {
                         onCastSpell: { spell, slotLevel in
                             viewModel.castSpell(spell, atLevel: slotLevel, forEntity: selectedNPC.id, entityType: .npc, name: selectedNPC.name)
                         },
+                        onUseAction: { action in
+                            viewModel.useAction(action, forEntity: selectedNPC.id, entityType: .npc, name: selectedNPC.name)
+                        },
                         isInTracker: viewModel.isInTracker(sidebarID: sidebarID),
                         onToggleTracker: {
                             viewModel.toggleTracker(sidebarID: sidebarID)
@@ -124,6 +127,8 @@ struct CampaignDetailPane: View {
                     LootDetailView(item: selectedLootItem)
                 } else if let selectedSpell = viewModel.selectedSpellEntry {
                     SpellDetailView(spell: selectedSpell)
+                } else if let selectedAsset = viewModel.selectedAsset {
+                    AssetDetailView(asset: selectedAsset)
                 } else if let selectedItem = viewModel.selectedSidebarItem {
                     Text(selectedItem.title)
                         .font(.title2)

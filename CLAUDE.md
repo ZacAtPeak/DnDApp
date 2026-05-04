@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A D&D session companion app built with SwiftUI targeting macOS, iOS, and visionOS (deployment target 26.4, Swift 5.0). The app is in early development — all data is currently hardcoded demo data with no persistence layer yet.
+A D&D session companion app built with SwiftUI targeting macOS, iOS, and visionOS (deployment target 26.4, Swift 5.0). The app is in early development — core data is hardcoded demo data with a limited JSON persistence layer for roll history.
 
 ## Build & Run
 
@@ -44,10 +44,11 @@ DnDAppSwiftUI/
 │   ├── GameMechanics/              # Shared enums & value types
 │   │   ├── AbilityScores.swift
 │   │   ├── Alignment.swift
-│   │   ├── Attack.swift
+│   │   ├── Attack.swift            # Optional saveDC, maxUses, remainingUses
 │   │   ├── CreatureSize.swift
 │   │   ├── CreatureType.swift
 │   │   ├── DamageType.swift
+│   │   ├── DiceRoll.swift          # `rollDice(_:)` parser for XdY+Z expressions
 │   │   ├── EquippedModifiers.swift # Aggregates equipped item modifiers; [LootItem] extension
 │   │   ├── ItemModifier.swift      # Enum: AC/save/atk/dmg bonuses, ability score overrides
 │   │   ├── LegendaryAction.swift
@@ -61,18 +62,21 @@ DnDAppSwiftUI/
 │   │   ├── SpellSlot.swift         # Includes Int.romanNumeral extension
 │   │   └── StatusCondition.swift
 │   └── Entities/                   # Concrete entity models
+│       ├── Asset.swift             # Campaign asset (location, dungeon, quest hook, faction, etc.)
 │       ├── Combatent.swift
 │       ├── CombatParticipant.swift
+│       ├── Encounter.swift         # Named encounter with member sidebar IDs
 │       ├── InventoryItem.swift     # Per-entity inventory slot (lootItemID + isEquipped)
 │       ├── LootItem.swift          # Wiki loot entry with structured `modifiers: [ItemModifier]`
 │       ├── Monster.swift
 │       ├── NPC.swift
 │       ├── PlayerCharacter.swift
-│       ├── SpellEntry.swift        # Wiki spell entry (level, school, casting time, etc.)
+│       ├── SpellEntry.swift        # Wiki spell entry (level, school, casting time, saveDC, etc.)
 │       └── WikiEntry.swift         # Wiki rules entry with aliases for inline linking
 ├── Services/
 │   ├── CampaignDataService.swift   # Entity lookup, combatent factory, initiative rolls
-│   └── DemoData/                   # Hardcoded demo data (no persistence yet)
+│   └── DemoData/                   # Hardcoded demo data
+│       ├── AssetData.swift         # Public & private campaign assets
 │       ├── CombatentData.swift
 │       ├── LootData.swift
 │       ├── MonsterData.swift
@@ -83,19 +87,29 @@ DnDAppSwiftUI/
 │       ├── StatusData.swift
 │       └── WikiData.swift
 ├── ViewModels/
-│   └── CampaignViewModel.swift     # @Observable root view model; all UI state & business logic
+│   ├── CampaignViewModel.swift            # @Observable root view model; shared state
+│   ├── CampaignViewModel+Combat.swift     # Action uses, spellcasting, long rest
+│   ├── CampaignViewModel+Creation.swift   # Entity creation (players, wiki, loot, encounters)
+│   ├── CampaignViewModel+Initiative.swift # Initiative tracker management
+│   ├── CampaignViewModel+Inventory.swift  # Inventory & equipment toggling
+│   ├── CampaignViewModel+Rolls.swift      # Roll logging & JSON save
+│   ├── CampaignViewModel+Search.swift     # Search results across all entities
+│   ├── CampaignViewModel+Sidebar.swift    # Sidebar tree & selection helpers
+│   └── CampaignViewModel+Status.swift     # Status palette & assignment
 └── Views/
     ├── CampaignRootView.swift      # NavigationSplitView root
     ├── CampaignDetailPane.swift    # Detail pane content switcher
     ├── CampaignToolbar.swift       # ToolbarContent for Long Rest, Statuses, Add, Search, Roll History
     ├── CharacterCreationView.swift # Sheet form for building a new PlayerCharacter
+    ├── EncounterCreationView.swift # Sheet form for adding a new Encounter
+    ├── LootEntryCreationView.swift # Sheet form for adding custom LootItem with modifiers
     ├── RollHistoryInspectorView.swift # Right-side inspector showing the roll log (auto-scrolls)
     ├── SearchOverlayView.swift     # Cmd+F-style overlay for searching all entities
     ├── WikiEntryCreationView.swift # Sheet form for adding a new wiki entry
     ├── Common/                     # Reusable layout components (<100 lines each)
     │   ├── AbilityScoreCell.swift  # Highlights cells modified by equipment
     │   ├── AbilityScoresView.swift # Accepts `modifiedAbilities: Set<String>`
-    │   ├── ActionsView.swift
+    │   ├── ActionsView.swift       # Displays attacks with optional save DC & uses
     │   ├── CreatureSummaryGrid.swift # Accepts `acBonus: Int` for equipped AC bonuses
     │   ├── DescriptionRow.swift
     │   ├── DetailHeader.swift
@@ -104,6 +118,7 @@ DnDAppSwiftUI/
     │   ├── LegendaryActionsView.swift
     │   ├── SkillsView.swift        # Skill proficiencies with rollable bonuses
     │   ├── SpecialAbilitiesView.swift
+    │   ├── SpellInventorySection.swift # Known spells with Cast button & slot picker
     │   ├── SpellSlotsView.swift    # Pip rows prefixed with Roman numeral level labels
     │   ├── StatValueRow.swift
     │   ├── StatusEditorRow.swift
@@ -111,6 +126,7 @@ DnDAppSwiftUI/
     │   ├── SummaryMetric.swift
     │   └── WikiLinkedText.swift    # Auto-detects wiki terms in text and renders as links
     ├── Detail/                     # Full stat-block detail views
+    │   ├── AssetDetailView.swift
     │   ├── CombatentDetailView.swift
     │   ├── InitiativeSelectionDetailView.swift
     │   ├── LootDetailView.swift
@@ -130,30 +146,37 @@ DnDAppSwiftUI/
 
 ### State Management
 
-`CampaignViewModel` (`@Observable`, `@MainActor`) is the single source of truth for the campaign screen. It owns:
+`CampaignViewModel` (`@Observable`, `@MainActor`) is the single source of truth for the campaign screen. It is split into multiple extension files by domain.
 
 **Selection / sheets / overlays:**
 - `selectedItemID: String?` — sidebar selection
 - `selectedInitiativeCombatentID: Combatent.ID?` — selected tracker card
+- `isInitiativeTargeted: Bool` — flags when a detail view action targets the initiative tracker
 - `editingCombatentID: Combatent.ID?` — triggers editor sheet
 - `isStatusPalettePresented: Bool` & `pendingStatus: StatusCondition?` — status assignment flow
 - `isLongRestConfirmationPresented: Bool`
 - `isCharacterCreationPresented: Bool` — drives `CharacterCreationView`
 - `isWikiEntryCreationPresented: Bool` — drives `WikiEntryCreationView`
+- `isLootCreationPresented: Bool` — drives `LootEntryCreationView`
+- `isEncounterCreationPresented: Bool` — drives `EncounterCreationView`
 - `isSearchPresented: Bool` & `searchQuery: String` — drives `SearchOverlayView`
 - `isRollHistoryPresented: Bool` — toggles right-side `RollHistoryInspectorView`
+- `isSettingsPresented: Bool`
+- `hasNewRollHistory: Bool` — badge indicator for unseen rolls
 
 **Live data:**
 - `combatents: [Combatent]` — live initiative tracker entries
 - `wikiEntries: [WikiEntry]` — wiki rules entries (mutable; `createWikiEntry(_:)` appends)
 - `lootItems: [LootItem]` — wiki loot entries (with structured `modifiers`)
 - `spellEntries: [SpellEntry]` — wiki spell entries
+- `assets: [Asset]` — campaign assets (locations, dungeons, quest hooks, factions, plots, maps)
+- `encounters: [Encounter]` — named encounter groups referencing sidebar IDs
 - `rollHistory: [RollEntry]` — append-at-front log of all rolls
 - `playerInventories: [UUID: [InventoryItem]]` — per-player inventory keyed by player ID
 - `monsterInventories: [UUID: [InventoryItem]]` — per-monster inventory
 - `npcInventories: [UUID: [InventoryItem]]` — per-NPC inventory
 
-The init pre-populates demo inventories for the first few players (e.g. wizard with Ring of Protection equipped) and a couple of NPCs.
+The init pre-populates demo inventories for the first few players (e.g. wizard with Ring of Protection equipped), a couple of NPCs, and one demo encounter (`Ambush at the Crossroads`).
 
 Views observe the view model via `@Bindable` (for bindings) or plain property access (for reads). The view model delegates entity lookups and combatent creation to `CampaignDataService`.
 
@@ -165,6 +188,7 @@ Shared enums:
 - `CreatureType` — Aberration, Beast, Dragon, etc.
 - `Alignment` — Lawful Good … Unaligned
 - `ItemModifier` — `.acBonus`, `.savingThrowBonus`, `.attackBonus`, `.damageBonus`, `.setAbilityScore(String, Int)` (with `displayText`)
+- `AssetType` — location, dungeon, questHook, treasureCache, faction, plot, npcGroup, map
 
 Entity types:
 
@@ -176,9 +200,11 @@ Entity types:
 | `Combatent` | Lightweight initiative-tracker row (name, HP, initiative, status, spell slots) |
 | `WikiEntry` | Rules glossary entry: id, title, description, optional aliases for matching |
 | `LootItem` | Magic item: id, name, type, rarity, description, properties, structured `modifiers` |
-| `SpellEntry` | Spell: name, level (0 = cantrip), school, casting time, range, components, duration, description, concentration/ritual flags |
+| `SpellEntry` | Spell: name, level (0 = cantrip), school, casting time, range, components, duration, description, concentration/ritual flags, optional `saveDC`, `damageRoll`, `damageType` |
 | `InventoryItem` | Inventory slot: random `UUID` + `lootItemID` + `isEquipped` |
 | `RollEntry` | Roll log row: type, name, roll, modifier, total, timestamp |
+| `Asset` | Campaign asset: id, name, type, description, public/private flag, optional location/difficulty/rewards |
+| `Encounter` | Named encounter: id, name, member sidebar IDs |
 
 `Combatent` is intentionally separate from the full entity types — it carries only the fields needed for the tracker strip. Note the existing misspelling (`Combatent` vs `Combatant`) — match it in new code to avoid compile errors.
 
@@ -188,13 +214,14 @@ Core structs:
 - `AbilityScores` — STR/DEX/CON/INT/WIS/CHA with computed modifiers
 - `MovementSpeed` — walk, optional swim/fly/climb/burrow, hover flag
 - `Senses` — darkvision, blindsight, tremorsense, truesight, passive perception
-- `Attack` — to-hit action with reach, damage roll, and damage type
+- `Attack` — to-hit action with reach, damage roll, damage type, optional `saveDC`, `description`, `maxUses`, `remainingUses`
 - `SpecialAbility` — passive trait or feature description
 - `LegendaryAction` — name, cost, and description
 - `SpellSlot` — count and level. The file also extends `Int` with `.romanNumeral` (used by spell-slot UI and spell levels).
 - `StatusCondition` — name, short effect, and longer description
 - `SidebarItem` — recursive tree node for sidebar navigation (`id`, `title`, `systemImage`, `children`)
 - `EquippedModifiers` — aggregates AC/save/atk/dmg bonuses + ability-score overrides; provides `effectiveScores(base:)`, `effectiveAC(base:)`, and `modifiedAbilityKeys`. `Array<LootItem>.equippedModifiers(for: [InventoryItem])` builds it from inventory.
+- `DiceRollResult` — `rollSum`, `modifier`, `total`. Produced by `rollDice(_:)` which parses `XdY+Z` strings.
 
 ### Inventory & Equipment
 
@@ -207,15 +234,19 @@ When an item is equipped, its `LootItem.modifiers` are aggregated into an `Equip
 
 Toggle equip state via `viewModel.toggleEquip(inventoryItemID:forEntity:entityType:)` where `entityType` is the `InventoryEntityType` enum (`.player` / `.monster` / `.npc`). The reusable `InventorySection` view renders the inventory list with an equip/unequip shield button and lists active modifiers in green when equipped.
 
+### Spell Casting
+
+`SpellInventorySection` renders a character's known spells with a **Cast** button. Tapping it opens a `SpellSlotPickerPopover` that shows available slots of the spell's level or higher. Casting consumes one slot and logs the action. Cantrips require no slot. Spells display an optional `saveDC` inline.
+
 ### Services
 
 `CampaignDataService` is a singleton (nonisolated) that provides:
-- Entity lookup by sidebar ID (`player(for:)`, `monster(for:)`, `npc(for:)`, `wikiEntry(for:)`)
+- Entity lookup by sidebar ID (`player(for:)`, `monster(for:)`, `npc(for:)`, `wikiEntry(for:)`, `combatParticipant(for:)`)
 - Recursive sidebar item search
 - Combatent factory (`makeCombatent(from:)`)
 - Initiative roll generation (`rolledInitiative(for:)` and `initiativeRoll(for:)` for logged rolls)
 
-Demo data lives in `Services/DemoData/` as global constants. `testPlayers` is declared as `var` so `longRest()` and `createPlayerCharacter(_:)` can mutate it. Wiki/loot/spell collections are owned by the view model (`wikiEntries`, `lootItems`, `spellEntries`) and seeded from their respective demo-data files. No persistence or networking exists yet.
+Demo data lives in `Services/DemoData/` as global constants. `testPlayers` is declared as `var` so `longRest()` and `createPlayerCharacter(_:)` can mutate it. Wiki/loot/spell/asset collections are owned by the view model (`wikiEntries`, `lootItems`, `spellEntries`, `assets`) and seeded from their respective demo-data files.
 
 ### Views
 
@@ -226,7 +257,9 @@ Demo data lives in `Services/DemoData/` as global constants. `testPlayers` is de
 **Sidebar tree** (built dynamically by `CampaignViewModel.sidebarItems`):
 - `Players` — one row per `PlayerCharacter`
 - `NPCs` → `Monsters` / `Characters` / `Other`
-- `Public Assets`, `Private Assets` (placeholders)
+- `Encounters` — named encounter groups; children show member names
+- `Public Assets` — public campaign assets (locations, dungeons, quest hooks, etc.)
+- `Private Assets` — private/secret campaign assets
 - `Wiki`
   - `Entries` — rules glossary
   - `Loot` — magic items
@@ -241,25 +274,30 @@ Demo data lives in `Services/DemoData/` as global constants. `testPlayers` is de
 **Detail Pane:** `CampaignDetailPane` switches between:
 - `InitiativeSelectionDetailView` (delegates to linked player/monster/NPC detail, or falls back to `CombatentDetailView`)
 - `PlayerCharacterDetailView` / `MonsterDetailView` / `NPCDetailView` for sidebar selections — each receives `inventory`, `allLoot`, and an `onToggleEquip` callback so equipment modifiers flow into the displayed stats
+- `AssetDetailView` for campaign assets
 - `WikiDetailView` / `LootDetailView` / `SpellDetailView` for wiki sidebar items
 - Placeholder for non-entity sidebar items
 
-The pane sets two environment values: `\.wikiEntries` (used by `WikiLinkedText` to detect glossary terms) and `\.navigateToWikiEntry` (so any inline wiki link can switch the sidebar selection).
+The pane sets two environment values: `\.wikiEntries` (used by `WikiLinkedText` to detect glossary terms) and `\.navigateToWikiEntry` (so any inline wiki link can switch the sidebar selection), plus `\.navigateToSpellEntry` for spell links.
 
 **Toolbar:** `CampaignToolbar` (`ToolbarContent`) provides:
 - **Long Rest** — resets all combatants' and players' HP and clears statuses (after confirmation)
 - **Statuses** — opens `StatusPaletteView` popover to queue or drag statuses
-- **Add** menu — opens `CharacterCreationView` to add a player or `WikiEntryCreationView` to add a wiki entry
+- **Add** menu — opens `CharacterCreationView` to add a player, `WikiEntryCreationView` to add a wiki entry, `LootEntryCreationView` to add custom loot, or `EncounterCreationView` to add an encounter
 - **Search** — opens `SearchOverlayView`
 - **Roll History** — toggles the `RollHistoryInspectorView` panel
 
-**Roll History:** `RollHistoryInspectorView` displays `viewModel.rollHistory` (newest at top). It uses a `ScrollViewReader` with a hidden bottom anchor and animates a scroll on every count change so newly added rolls are always visible.
+**Roll History:** `RollHistoryInspectorView` displays `viewModel.rollHistory` (newest at top). It uses a `ScrollViewReader` with a hidden bottom anchor and animates a scroll on every count change so newly added rolls are always visible. A **Save** button exports the current roll history to a timestamped JSON file in the Documents directory.
 
-**Search:** `SearchOverlayView` searches across players, monsters, NPCs, wiki entries, loot, and spells — clicking a result selects the corresponding sidebar item.
+**Search:** `SearchOverlayView` searches across players, monsters, NPCs, wiki entries, loot, spells, assets, and encounters — clicking a result selects the corresponding sidebar item.
 
 **Character Creation:** `CharacterCreationView` is a form-based sheet that builds a `PlayerCharacter` and hands it back via an `onSave` closure. `CampaignRootView` wires the closure to `CampaignViewModel.createPlayerCharacter(_:)`.
 
 **Wiki Entry Creation:** `WikiEntryCreationView` is a form-based sheet for adding a new `WikiEntry`. The view model's `createWikiEntry(_:)` ensures unique IDs by appending `-2`, `-3`, etc. on collision.
+
+**Loot Entry Creation:** `LootEntryCreationView` is a form-based sheet for creating a custom `LootItem` with name, type, rarity, description, attunement, properties, and structured modifiers (AC bonus, save bonus, attack bonus, damage bonus, or ability-score override).
+
+**Encounter Creation:** `EncounterCreationView` is a lightweight sheet that creates a new `Encounter` with a name.
 
 ### Demo Data
 
@@ -271,9 +309,12 @@ Global constants in `Services/DemoData/`:
 - `wikiDemoData: [WikiEntry]` — ~12 rules entries (Advantage, Disadvantage, Concentration, etc.) seeded into the view model
 - `lootDemoData: [LootItem]` — 10 magic items; items with structured `modifiers` include Ring of Protection, Gauntlets of Ogre Power, Amulet of Health, Sword of Vengeance, Dwarven Thrower
 - `spellDemoData: [SpellEntry]` — 16 spells across all levels (cantrips through 9th)
+- `assetDemoData: [Asset]` — 13 campaign assets (public & private) including locations, dungeons, quest hooks, factions, plots, and maps
 - `sidebarItems: [SidebarItem]` — legacy static tree (the live tree is computed by `CampaignViewModel.sidebarItems`)
 
-No persistence or networking exists yet.
+### Persistence
+
+No full persistence layer exists yet. Roll history can be exported to a timestamped JSON file via `CampaignViewModel.saveRollHistory()`. All other data resets to demo state on app launch.
 
 ### Test Frameworks
 

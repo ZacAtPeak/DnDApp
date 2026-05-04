@@ -52,8 +52,52 @@ extension CampaignViewModel {
                     SidebarItem(id: "npc-other", title: "Other", systemImage: "square.grid.2x2", children: nil)
                 ]
             ),
-            SidebarItem(id: "public-assets", title: "Public Assets", systemImage: "globe", children: nil),
-            SidebarItem(id: "private-assets", title: "Private Assets", systemImage: "lock", children: nil),
+            SidebarItem(
+                id: "encounters",
+                title: "Encounters",
+                systemImage: "shield.lefthalf.filled",
+                children: encounters.map { encounter in
+                    SidebarItem(
+                        id: "encounter-\(encounter.id.uuidString)",
+                        title: encounter.name,
+                        systemImage: "folder",
+                        children: encounter.memberSidebarIDs.map { memberID in
+                            SidebarItem(
+                                id: "encounter-\(encounter.id.uuidString)-member-\(memberID)",
+                                title: dataService.combatParticipant(for: memberID)?.name ?? "Unknown",
+                                systemImage: iconForSidebarID(memberID),
+                                children: nil
+                            )
+                        }
+                    )
+                }
+            ),
+            SidebarItem(
+                id: "public-assets",
+                title: "Public Assets",
+                systemImage: "globe",
+                children: assets.filter { $0.isPublic }.map { asset in
+                    SidebarItem(
+                        id: "asset-\(asset.id)",
+                        title: asset.name,
+                        systemImage: iconForAssetType(asset.type),
+                        children: nil
+                    )
+                }
+            ),
+            SidebarItem(
+                id: "private-assets",
+                title: "Private Assets",
+                systemImage: "lock",
+                children: assets.filter { !$0.isPublic }.map { asset in
+                    SidebarItem(
+                        id: "asset-\(asset.id)",
+                        title: asset.name,
+                        systemImage: iconForAssetType(asset.type),
+                        children: nil
+                    )
+                }
+            ),
             SidebarItem(
                 id: "wiki",
                 title: "Wiki",
@@ -127,9 +171,42 @@ extension CampaignViewModel {
         return spellEntries.first { $0.id == String(id.dropFirst(6)) }
     }
 
+    var selectedAsset: Asset? {
+        guard let id = selectedItemID, id.hasPrefix("asset-") else { return nil }
+        return assets.first { $0.id == String(id.dropFirst(6)) }
+    }
+
     func selectSidebarItem(_ id: String?) {
+        if let id = id,
+           id.hasPrefix("encounter-"),
+           let memberRange = id.range(of: "-member-") {
+            let memberID = String(id[memberRange.upperBound...])
+            selectedItemID = memberID
+            selectedInitiativeCombatentID = nil
+            return
+        }
         selectedItemID = id
         selectedInitiativeCombatentID = nil
+    }
+
+    private func iconForSidebarID(_ sidebarID: String) -> String {
+        if sidebarID.hasPrefix("player-") { return "person" }
+        if sidebarID.hasPrefix("monster-") { return "ant.fill" }
+        if sidebarID.hasPrefix("character-") { return "person.fill" }
+        return "questionmark"
+    }
+
+    private func iconForAssetType(_ type: AssetType) -> String {
+        switch type {
+        case .location: return "mappin"
+        case .dungeon: return "cave.2"
+        case .questHook: return "scroll"
+        case .treasureCache: return "banknote"
+        case .faction: return "star.fill"
+        case .plot: return "books.vertical"
+        case .npcGroup: return "person.3.fill"
+        case .map: return "map"
+        }
     }
 
     private func spellSidebarGroups() -> [SidebarItem] {
