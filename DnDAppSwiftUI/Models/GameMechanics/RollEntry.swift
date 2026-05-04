@@ -8,4 +8,8 @@ struct RollEntry: Identifiable, Codable {
     let modifier: Int
     let total: Double
     let timestamp: Date
+
+    enum CodingKeys: String, CodingKey {
+        case type, name, roll, modifier, total, timestamp
+    }
 }

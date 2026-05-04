@@ -16,7 +16,7 @@ struct AssetDetailView: View {
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color(.controlBackgroundColor))
+                        .background(Color.gray.opacity(0.2))
                         .cornerRadius(4)
 
                     if asset.isPublic {
