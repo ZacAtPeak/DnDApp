@@ -50,13 +50,14 @@ struct InitiativeCard: View {
                 .scaleEffect(isFlipped ? 0.9 : 1)
                 .allowsHitTesting(!isFlipped)
                 .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .onTapGesture(count: 2) {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        isFlipped = true
-                    }
-                }
                 .onTapGesture {
-                    onSelect()
+                    if isSelected {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            isFlipped = true
+                        }
+                    } else {
+                        onSelect()
+                    }
                 }
                 .onLongPressGesture {
                     onEdit()
@@ -88,7 +89,7 @@ struct InitiativeCard: View {
                 onRemove()
             }
         }
-        .help("Double-click to quick-edit HP and spell slots. Tap the X to flip back. Long press or secondary-click to edit.")
+        .help("Tap to select. Tap again to quick-edit HP and spell slots. Tap the X to flip back. Long press or secondary-click to edit.")
     }
 
     // MARK: - Front
