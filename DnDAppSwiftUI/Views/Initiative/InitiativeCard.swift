@@ -7,7 +7,7 @@ struct InitiativeCard: View {
     var onEdit: () -> Void
     var onRemove: () -> Void
     var onMakeTurn: () -> Void
-    var onStatusDrop: ([String]) -> Bool
+    var onStatusDrop: ([StatusDragPayload]) -> Bool
     @State private var isStatusTargeted = false
     @State private var isFlipped = false
 
@@ -73,7 +73,7 @@ struct InitiativeCard: View {
         .animation(.easeInOut(duration: 0.2), value: isFlipped)
         .animation(.easeInOut(duration: 0.2), value: isDefeated)
         .frame(width: 160, alignment: .leading)
-        .dropDestination(for: String.self) { payloads, _ in
+        .dropDestination(for: StatusDragPayload.self) { payloads, _ in
             onStatusDrop(payloads)
         } isTargeted: { targeted in
             isStatusTargeted = targeted
