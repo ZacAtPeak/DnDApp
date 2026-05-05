@@ -14,11 +14,13 @@ extension CampaignViewModel {
         )
         rollHistory.append(entry)
         hasNewRollHistory = true
+        publishNetworkSnapshot(reason: "roll logged")
     }
 
     func clearRollHistory() {
         rollHistory.removeAll()
         hasNewRollHistory = false
+        publishNetworkSnapshot(reason: "roll history cleared")
     }
 
     func markRollHistorySeen() {

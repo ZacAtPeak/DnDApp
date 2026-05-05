@@ -37,6 +37,7 @@ extension CampaignViewModel {
         } set: { updatedCombatent in
             guard let index = self.combatents.firstIndex(where: { $0.id == editingCombatentID }) else { return }
             self.combatents[index] = updatedCombatent
+            self.publishNetworkSnapshot(reason: "combatent edited")
         }
     }
 
@@ -69,6 +70,7 @@ extension CampaignViewModel {
         }
         combatents.append(contentsOf: added)
         combatents.sort { $0.initiative > $1.initiative }
+        if !added.isEmpty { publishNetworkSnapshot(reason: "combatents added") }
         return !added.isEmpty
     }
 
@@ -80,6 +82,7 @@ extension CampaignViewModel {
         if editingCombatentID == id {
             editingCombatentID = nil
         }
+        publishNetworkSnapshot(reason: "combatent removed")
     }
 
     func clearInitiativeTracker() {
@@ -103,6 +106,7 @@ extension CampaignViewModel {
         )
         combatents.append(lairAction)
         combatents.sort { $0.initiative > $1.initiative }
+        publishNetworkSnapshot(reason: "lair action added")
     }
 
     func advanceTurn() {
@@ -113,6 +117,7 @@ extension CampaignViewModel {
             combatents[currentIndex].isTurn = false
         }
         combatents[nextIndex].isTurn = true
+        publishNetworkSnapshot(reason: "turn advanced")
     }
 
     func rewindTurn() {
@@ -123,12 +128,14 @@ extension CampaignViewModel {
             combatents[currentIndex].isTurn = false
         }
         combatents[prevIndex].isTurn = true
+        publishNetworkSnapshot(reason: "turn rewound")
     }
 
     func makeCurrentTurn(for combatentID: Combatent.ID) {
         for index in combatents.indices {
             combatents[index].isTurn = combatents[index].id == combatentID
         }
+        publishNetworkSnapshot(reason: "current turn changed")
     }
 
     func beginEditing(combatentID: Combatent.ID) {

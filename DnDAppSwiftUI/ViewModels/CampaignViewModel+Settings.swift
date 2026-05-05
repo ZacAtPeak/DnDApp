@@ -21,6 +21,7 @@ extension CampaignViewModel {
         selectedItemID = "players"
         selectedInitiativeCombatentID = nil
         dataVersion += 1
+        publishNetworkSnapshot(reason: "demo data removed")
     }
 
     /// Restores demo data from the immutable DemoDataStore.
@@ -43,6 +44,7 @@ extension CampaignViewModel {
         selectedItemID = "players"
         selectedInitiativeCombatentID = nil
         dataVersion += 1
+        publishNetworkSnapshot(reason: "demo data restored")
     }
 
     func savedSessionFiles() -> [URL] {

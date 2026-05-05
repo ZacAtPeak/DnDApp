@@ -40,5 +40,6 @@ extension CampaignViewModel {
             guard let idx = npcInventories[entityID]?.firstIndex(where: { $0.id == inventoryItemID }) else { return }
             npcInventories[entityID]![idx].isEquipped.toggle()
         }
+        publishNetworkSnapshot(reason: "equipment toggled")
     }
 }

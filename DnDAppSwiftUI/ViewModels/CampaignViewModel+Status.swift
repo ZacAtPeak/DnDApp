@@ -50,6 +50,7 @@ extension CampaignViewModel {
             statuses.append(status)
         }
         combatents[index].status = statuses
+        publishNetworkSnapshot(reason: "status assigned")
     }
 
     private func statusFromDragPayload(_ payload: StatusDragPayload) -> StatusCondition? {
