@@ -1,4 +1,6 @@
 import Foundation
+import CoreTransferable
+import UniformTypeIdentifiers
 
 // MARK: - Status palette & assignment
 
@@ -33,7 +35,7 @@ extension CampaignViewModel {
         self.pendingStatus = nil
     }
 
-    func assignDraggedStatus(from payloads: [String], to combatentID: Combatent.ID) -> Bool {
+    func assignDraggedStatus(from payloads: [StatusDragPayload], to combatentID: Combatent.ID) -> Bool {
         let statuses = payloads.compactMap(statusFromDragPayload)
         for status in statuses {
             assignStatus(status, to: combatentID)
@@ -50,10 +52,8 @@ extension CampaignViewModel {
         combatents[index].status = statuses
     }
 
-    private func statusFromDragPayload(_ payload: String) -> StatusCondition? {
-        guard payload.hasPrefix(statusDragPayloadPrefix) else { return nil }
-        let statusName = String(payload.dropFirst(statusDragPayloadPrefix.count))
-        return assignableStatuses.first { $0.name == statusName }
+    private func statusFromDragPayload(_ payload: StatusDragPayload) -> StatusCondition? {
+        assignableStatuses.first { $0.name == payload.name }
     }
 
     private func uniqueStatuses(from statuses: [StatusCondition]) -> [StatusCondition] {
@@ -68,8 +68,18 @@ extension CampaignViewModel {
 
 // MARK: - Drag payload helpers
 
-private let statusDragPayloadPrefix = "status:"
+struct StatusDragPayload: Codable, Transferable {
+    let name: String
 
-func statusDragPayload(for status: StatusCondition) -> String {
-    "\(statusDragPayloadPrefix)\(status.name)"
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .statusCondition)
+    }
+}
+
+private extension UTType {
+    static let statusCondition = UTType(exportedAs: "com.zacharyreyes.dndappswiftui.status-condition")
+}
+
+func statusDragPayload(for status: StatusCondition) -> StatusDragPayload {
+    StatusDragPayload(name: status.name)
 }
