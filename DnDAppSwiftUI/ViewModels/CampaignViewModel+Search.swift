@@ -84,6 +84,22 @@ extension CampaignViewModel {
             }
         }
 
+        for asset in assets {
+            let matchesName = asset.name.lowercased().contains(query)
+            let matchesType = asset.type.rawValue.lowercased().contains(query)
+            let matchesDesc = asset.description.lowercased().contains(query)
+            if matchesName || matchesType || matchesDesc {
+                let visibility = asset.isPublic ? "Public" : "Private"
+                results.append(SearchResult(
+                    id: "asset-\(asset.id)",
+                    title: asset.name,
+                    subtitle: "\(asset.type.rawValue) • \(visibility)",
+                    systemImage: asset.isPublic ? "globe" : "lock.fill",
+                    sidebarID: "asset-\(asset.id)"
+                ))
+            }
+        }
+
         return results
     }
 }
