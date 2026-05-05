@@ -62,10 +62,14 @@ final class CampaignDataService {
 
     // MARK: - Initiative
 
-    func initiativeRoll(for abilityScores: AbilityScores) -> (roll: Int, modifier: Int, total: Double) {
+    func initiativeRoll(bonus: Int) -> (roll: Int, modifier: Int, total: Double) {
         let roll = Int.random(in: 1...20)
-        let modifier = Int(floor(Double(abilityScores.dexterity - 10) / 2))
-        return (roll, modifier, Double(roll + modifier))
+        return (roll, bonus, Double(roll + bonus))
+    }
+
+    func initiativeRoll(for abilityScores: AbilityScores) -> (roll: Int, modifier: Int, total: Double) {
+        let bonus = Int(floor(Double(abilityScores.dexterity - 10) / 2))
+        return initiativeRoll(bonus: bonus)
     }
 
     func rolledInitiative(for abilityScores: AbilityScores) -> Double {

@@ -8,6 +8,7 @@ protocol CombatParticipant: Identifiable where ID == UUID {
     var status: [StatusCondition]? { get }
     var spellSlots: [SpellSlot] { get }
     var knownSpells: [String] { get }
+    var initiative: Double { get }
 }
 
 extension Monster: CombatParticipant {

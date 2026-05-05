@@ -79,12 +79,30 @@ struct RollHistoryInspectorView: View {
 private struct RollHistoryRow: View {
     let entry: RollEntry
 
+    private var criticalStatus: CriticalStatus {
+        if entry.roll == 20 { return .success }
+        if entry.roll == 1 { return .failure }
+        return .normal
+    }
+
     private var totalColor: Color {
-        let t = Int(entry.total)
-        if t >= 20 { return .yellow }
-        if t >= 15 { return .green }
-        if t <= 4  { return .red }
-        return .primary
+        switch criticalStatus {
+        case .success: return .green
+        case .failure: return .red
+        case .normal:  return .primary
+        }
+    }
+
+    private var backgroundColor: Color? {
+        switch criticalStatus {
+        case .success: return .green
+        case .failure: return .red
+        case .normal: return nil
+        }
+    }
+
+    enum CriticalStatus {
+        case success, failure, normal
     }
 
     var body: some View {
@@ -139,11 +157,17 @@ private struct RollHistoryRow: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 10)
-        .background(.ultraThinMaterial)
+        .background {
+            if let bgColor = backgroundColor {
+                bgColor.opacity(0.15)
+            } else {
+                Color(nsColor: .controlBackgroundColor).opacity(0.5)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(Color.primary.opacity(0.07), lineWidth: 1)
+                .stroke((backgroundColor ?? Color.primary).opacity(0.07), lineWidth: 1)
         }
     }
 }

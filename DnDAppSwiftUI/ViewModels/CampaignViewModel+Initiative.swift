@@ -51,7 +51,7 @@ extension CampaignViewModel {
             }
             let initiative: Double
             if let participant = dataService.combatParticipant(for: id) {
-                let details = dataService.initiativeRoll(for: participant.abilityScores)
+                let details = dataService.initiativeRoll(bonus: Int(participant.initiative))
                 logRoll(
                     type: "Initiative",
                     name: participant.name,
@@ -80,6 +80,12 @@ extension CampaignViewModel {
         if editingCombatentID == id {
             editingCombatentID = nil
         }
+    }
+
+    func clearInitiativeTracker() {
+        combatents.removeAll()
+        selectedInitiativeCombatentID = nil
+        editingCombatentID = nil
     }
 
     func addLairAction() {

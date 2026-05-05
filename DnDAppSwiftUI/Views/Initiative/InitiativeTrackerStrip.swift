@@ -38,6 +38,10 @@ struct InitiativeTrackerStrip: View {
                     Button("Add Lair Action") {
                         viewModel.addLairAction()
                     }
+                    Divider()
+                    Button("Clear Tracker", role: .destructive) {
+                        viewModel.clearInitiativeTracker()
+                    }
                 } label: {
                     Image(systemName: "ellipsis.circle")
                         .font(.title3)
