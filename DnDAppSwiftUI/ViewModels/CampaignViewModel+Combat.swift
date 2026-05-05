@@ -33,6 +33,7 @@ extension CampaignViewModel {
         case .monster:
             break
         }
+        publishNetworkSnapshot(reason: "action used")
     }
 
     func castSpell(_ spellEntry: SpellEntry, atLevel slotLevel: Int, forEntity entityID: UUID, entityType: InventoryEntityType, name: String) {
@@ -61,6 +62,7 @@ extension CampaignViewModel {
                 total: 0
             )
         }
+        publishNetworkSnapshot(reason: "spell cast")
     }
 
     func longRest() {
@@ -96,6 +98,7 @@ extension CampaignViewModel {
                 }
             }
         }
+        publishNetworkSnapshot(reason: "long rest")
     }
 
     private func expendSpellSlot(level: Int, for entityID: UUID, entityType: InventoryEntityType) {

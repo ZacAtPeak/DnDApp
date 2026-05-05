@@ -45,6 +45,12 @@ final class CampaignViewModel {
 
     let dataService: CampaignDataService
 
+    // MARK: - Networking
+
+    @ObservationIgnored let networkingService = CampaignNetworkingService()
+    @ObservationIgnored var networkAssignments: [PlayerAssignment] = []
+    @ObservationIgnored var publishWorkItem: DispatchWorkItem?
+
     // MARK: - Init
 
     init(dataService: CampaignDataService) {

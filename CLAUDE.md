@@ -30,6 +30,12 @@ Run a single test (Swift Testing):
 xcodebuild test -project DnDAppSwiftUI.xcodeproj -scheme DnDAppSwiftUITests -only-testing:DnDAppSwiftUITests/DnDAppSwiftUITests/exampleTest
 ```
 
+### Notes
+
+- Parallel test execution (`-parallel-testing-enabled YES`) causes Swift Testing runner crashes unrelated to test logic. Use `-parallel-testing-enabled NO` for reliable runs.
+- No keep-alive/reconnection logic exists yet.
+- Snapshot application currently replaces full state; delta/incremental updates could reduce bandwidth.
+
 ## Architecture
 
 The app follows MVVM with `@Observable` state management and a lightweight service layer.

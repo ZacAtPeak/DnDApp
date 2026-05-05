@@ -6,6 +6,7 @@ extension CampaignViewModel {
     func createPlayerCharacter(_ player: PlayerCharacter) {
         testPlayers.append(player)
         selectedItemID = "player-\(player.id.uuidString)"
+        publishNetworkSnapshot(reason: "player created")
     }
 
     func createWikiEntry(_ entry: WikiEntry) {
@@ -18,6 +19,7 @@ extension CampaignViewModel {
         let stored = id == entry.id ? entry : WikiEntry(id: id, title: entry.title, description: entry.description, aliases: entry.aliases)
         wikiEntries.append(stored)
         selectedItemID = "wiki-\(stored.id)"
+        publishNetworkSnapshot(reason: "wiki entry created")
     }
 
     func createLootItem(_ item: LootItem) {
@@ -45,6 +47,7 @@ extension CampaignViewModel {
         }
         lootItems.append(stored)
         selectedItemID = "loot-\(stored.id)"
+        publishNetworkSnapshot(reason: "loot item created")
     }
 
     func createEncounter(name: String) {
@@ -53,6 +56,7 @@ extension CampaignViewModel {
         let encounter = Encounter(name: trimmed)
         encounters.append(encounter)
         selectedItemID = "encounter-\(encounter.id.uuidString)"
+        publishNetworkSnapshot(reason: "encounter created")
     }
 
     func deleteEncounter(id: UUID) {
@@ -60,6 +64,7 @@ extension CampaignViewModel {
         if selectedItemID == "encounter-\(id.uuidString)" {
             selectedItemID = nil
         }
+        publishNetworkSnapshot(reason: "encounter deleted")
     }
 
     func removeMemberFromEncounter(encounterID: UUID, memberSidebarID: String) {
@@ -92,5 +97,6 @@ extension CampaignViewModel {
         assets.append(stored)
         let prefix = asset.isPublic ? "asset-public" : "asset-private"
         selectedItemID = "\(prefix)-\(stored.id)"
+        publishNetworkSnapshot(reason: "asset created")
     }
 }
