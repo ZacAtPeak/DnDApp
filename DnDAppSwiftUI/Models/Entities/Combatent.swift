@@ -1,5 +1,11 @@
 import Foundation
 
+enum CombatentEntityType: String, Codable, Sendable {
+    case player
+    case monster
+    case npc
+}
+
 struct Combatent: Identifiable {
     var id: UUID = UUID()
     var name: String
@@ -13,5 +19,7 @@ struct Combatent: Identifiable {
     var spellSlots: [SpellSlot]
     var speed: MovementSpeed
     var sourceSidebarID: String? = nil
+    var sourceEntityID: UUID? = nil
+    var sourceEntityType: CombatentEntityType? = nil
     var isLairAction: Bool = false
 }

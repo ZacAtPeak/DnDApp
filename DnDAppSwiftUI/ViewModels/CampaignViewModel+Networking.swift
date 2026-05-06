@@ -5,6 +5,7 @@ extension CampaignViewModel {
     // MARK: - Host API
 
     func startHostingCampaignSession(name: String) {
+        replicatedState = CampaignSnapshotBuilder.readCurrentState(from: self, assignments: networkAssignments)
         networkingService.startHosting(sessionID: UUID(), sessionName: name) { [weak self] envelope, clientID in
             Task { @MainActor [weak self] in
                 self?.handleHostMessage(envelope, fromClient: clientID)
@@ -104,6 +105,7 @@ extension CampaignViewModel {
 
     func applyNetworkSnapshot(_ snapshot: CampaignNetworkSnapshot) {
         CampaignSnapshotBuilder.apply(snapshot, to: self)
+        replicatedState = snapshot.state
         networkingService.noteSnapshotApplied(snapshot.revision)
     }
 
@@ -172,8 +174,12 @@ extension CampaignViewModel {
                 networkingService.sendToHost(.requestSnapshot)
                 return
             }
-            CampaignDeltaApplier.apply(delta, to: self)
+            var state = replicatedState
+            CampaignDeltaApplier.apply(delta, to: &state)
+            replicatedState = state
+            CampaignSnapshotBuilder.writeState(state, to: self)
             networkingService.noteDeltaApplied(delta.revision)
+            checkRollSideEffects(delta.changes)
 
         case .deltaBatch(let batch):
             for delta in batch.deltas.sorted(by: { $0.revision < $1.revision }) {
@@ -182,8 +188,12 @@ extension CampaignViewModel {
                     networkingService.sendToHost(.requestSnapshot)
                     return
                 }
-                CampaignDeltaApplier.apply(delta, to: self)
+                var state = replicatedState
+                CampaignDeltaApplier.apply(delta, to: &state)
+                replicatedState = state
+                CampaignSnapshotBuilder.writeState(state, to: self)
                 networkingService.noteDeltaApplied(delta.revision)
+                checkRollSideEffects(delta.changes)
             }
 
         case .assignmentChanged(let assignment):
@@ -225,15 +235,20 @@ extension CampaignViewModel {
         }
 
         do {
+            var state = CampaignSnapshotBuilder.readCurrentState(from: self, assignments: networkAssignments)
             let changes = try CampaignMutationReducer.apply(
                 envelope.command,
                 from: clientID,
-                to: self,
+                to: &state,
                 assignments: networkAssignments
             )
+            CampaignSnapshotBuilder.writeState(state, to: self)
+            replicatedState = state
+
             let delta = networkingService.makeDelta(originClientID: clientID, changes: changes)
             networkingService.broadcastDelta(delta)
             acceptUpdate(commandID: envelope.commandID, appliedRevision: delta.revision, to: clientID)
+            checkRollSideEffects(changes)
         } catch let error as CampaignMutationReducer.ValidationError {
             switch error {
             case .rejected(let code, let reason):
@@ -271,6 +286,17 @@ extension CampaignViewModel {
         networkingService.recordAcceptedReceipt(receipt, for: clientID, commandID: commandID)
         if let connID = networkingService.connectionID(forClientID: clientID) {
             networkingService.send(.commandAccepted(receipt), to: connID)
+        }
+    }
+
+    // MARK: - Side Effects
+
+    private func checkRollSideEffects(_ changes: [CampaignDeltaChange]) {
+        for change in changes {
+            if case .rollInserted = change {
+                hasNewRollHistory = true
+                break
+            }
         }
     }
 }

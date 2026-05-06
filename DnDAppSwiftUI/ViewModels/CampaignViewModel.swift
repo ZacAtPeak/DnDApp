@@ -50,6 +50,7 @@ final class CampaignViewModel {
     @ObservationIgnored let networkingService = CampaignNetworkingService()
     @ObservationIgnored var networkAssignments: [PlayerAssignment] = []
     @ObservationIgnored var publishWorkItem: DispatchWorkItem?
+    @ObservationIgnored var replicatedState = CampaignReplicatedState()
 
     // MARK: - Init
 

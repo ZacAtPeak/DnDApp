@@ -535,6 +535,12 @@ nonisolated struct NetworkStatusCondition: Codable, Equatable, Sendable {
     let effect: String
     let desc: String
 
+    init(name: String, effect: String, desc: String) {
+        self.name = name
+        self.effect = effect
+        self.desc = desc
+    }
+
     init(from status: StatusCondition) {
         self.name = status.name
         self.effect = status.effect
@@ -573,6 +579,12 @@ nonisolated struct NetworkSpellSlot: Codable, Equatable, Sendable {
     let max: Int
     let available: Int
 
+    init(level: Int, max: Int, available: Int) {
+        self.level = level
+        self.max = max
+        self.available = available
+    }
+
     init(from slot: SpellSlot) {
         self.level = slot.level
         self.max = slot.max
@@ -595,6 +607,19 @@ nonisolated struct NetworkAttack: Codable, Equatable, Sendable {
     let description: String?
     let maxUses: Int?
     let remainingUses: Int?
+
+    init(id: UUID, name: String, hitBonus: Int, reach: String, damageRoll: String, damageType: String, saveDC: Int?, description: String?, maxUses: Int?, remainingUses: Int?) {
+        self.id = id
+        self.name = name
+        self.hitBonus = hitBonus
+        self.reach = reach
+        self.damageRoll = damageRoll
+        self.damageType = damageType
+        self.saveDC = saveDC
+        self.description = description
+        self.maxUses = maxUses
+        self.remainingUses = remainingUses
+    }
 
     init(from attack: Attack) {
         self.id = attack.id
@@ -632,7 +657,27 @@ nonisolated struct NetworkCombatent: Codable, Equatable, Sendable {
     let spellSlots: [NetworkSpellSlot]
     let speed: NetworkMovementSpeed
     let sourceSidebarID: String?
+    let sourceEntityID: UUID?
+    let sourceEntityType: String?
     let isLairAction: Bool
+
+    init(id: UUID, name: String, currentHP: Int, maxHP: Int, temporaryHP: Int, initiative: Double, isTurn: Bool, status: [NetworkStatusCondition]?, creatureType: String?, spellSlots: [NetworkSpellSlot], speed: NetworkMovementSpeed, sourceSidebarID: String?, sourceEntityID: UUID?, sourceEntityType: String?, isLairAction: Bool) {
+        self.id = id
+        self.name = name
+        self.currentHP = currentHP
+        self.maxHP = maxHP
+        self.temporaryHP = temporaryHP
+        self.initiative = initiative
+        self.isTurn = isTurn
+        self.status = status
+        self.creatureType = creatureType
+        self.spellSlots = spellSlots
+        self.speed = speed
+        self.sourceSidebarID = sourceSidebarID
+        self.sourceEntityID = sourceEntityID
+        self.sourceEntityType = sourceEntityType
+        self.isLairAction = isLairAction
+    }
 
     init(from c: Combatent) {
         self.id = c.id
@@ -642,11 +687,13 @@ nonisolated struct NetworkCombatent: Codable, Equatable, Sendable {
         self.temporaryHP = c.temporaryHP
         self.initiative = c.initiative
         self.isTurn = c.isTurn
-        self.status = c.status?.map { NetworkStatusCondition(from: $0) }
+        self.status = c.status.map { $0.map { NetworkStatusCondition(from: $0) } }
         self.creatureType = c.creatureType
         self.spellSlots = c.spellSlots.map { NetworkSpellSlot(from: $0) }
         self.speed = NetworkMovementSpeed(from: c.speed)
         self.sourceSidebarID = c.sourceSidebarID
+        self.sourceEntityID = c.sourceEntityID
+        self.sourceEntityType = c.sourceEntityType?.rawValue
         self.isLairAction = c.isLairAction
     }
 
@@ -654,11 +701,13 @@ nonisolated struct NetworkCombatent: Codable, Equatable, Sendable {
         Combatent(
             id: id, name: name, currentHP: currentHP, maxHP: maxHP,
             temporaryHP: temporaryHP, initiative: initiative, isTurn: isTurn,
-            status: status?.map { $0.toStatusCondition() },
+            status: status.map { $0.map { $0.toStatusCondition() } },
             creatureType: creatureType,
             spellSlots: spellSlots.map { $0.toSpellSlot() },
             speed: speed.toMovementSpeed(),
             sourceSidebarID: sourceSidebarID,
+            sourceEntityID: sourceEntityID,
+            sourceEntityType: sourceEntityType.flatMap { CombatentEntityType(rawValue: $0) },
             isLairAction: isLairAction)
     }
 }
@@ -670,6 +719,15 @@ nonisolated struct NetworkMovementSpeed: Codable, Equatable, Sendable {
     let climb: Int?
     let burrow: Int?
     let hover: Bool
+
+    init(walk: Int, swim: Int? = nil, fly: Int? = nil, climb: Int? = nil, burrow: Int? = nil, hover: Bool = false) {
+        self.walk = walk
+        self.swim = swim
+        self.fly = fly
+        self.climb = climb
+        self.burrow = burrow
+        self.hover = hover
+    }
 
     init(from s: MovementSpeed) {
         self.walk = s.walk
@@ -689,6 +747,12 @@ nonisolated struct NetworkInventoryItem: Codable, Equatable, Sendable {
     let id: UUID
     let lootItemID: String
     let isEquipped: Bool
+
+    init(id: UUID, lootItemID: String, isEquipped: Bool) {
+        self.id = id
+        self.lootItemID = lootItemID
+        self.isEquipped = isEquipped
+    }
 
     init(from item: InventoryItem) {
         self.id = item.id
@@ -726,7 +790,7 @@ nonisolated struct NetworkAbilityScores: Codable, Equatable, Sendable {
 }
 
 nonisolated struct NetworkPlayerState: Codable, Equatable, Sendable {
-    let id: UUID
+    let id: String
     let name: String
     let currentHP: Int
     let maxHP: Int
@@ -736,13 +800,25 @@ nonisolated struct NetworkPlayerState: Codable, Equatable, Sendable {
     let actions: [NetworkAttack]
     let initiative: Double
 
+    init(id: String, name: String, currentHP: Int, maxHP: Int, abilityScores: NetworkAbilityScores, status: [NetworkStatusCondition]?, spellSlots: [NetworkSpellSlot], actions: [NetworkAttack], initiative: Double) {
+        self.id = id
+        self.name = name
+        self.currentHP = currentHP
+        self.maxHP = maxHP
+        self.abilityScores = abilityScores
+        self.status = status
+        self.spellSlots = spellSlots
+        self.actions = actions
+        self.initiative = initiative
+    }
+
     init(from p: PlayerCharacter) {
-        self.id = p.id
+        self.id = p.id.uuidString
         self.name = p.name
         self.currentHP = p.currentHP
         self.maxHP = p.maxHP
         self.abilityScores = NetworkAbilityScores(from: p.abilityScores)
-        self.status = p.status?.map { NetworkStatusCondition(from: $0) }
+        self.status = p.status.map { $0.map { NetworkStatusCondition(from: $0) } }
         self.spellSlots = p.spellSlots.map { NetworkSpellSlot(from: $0) }
         self.actions = p.actions.map { NetworkAttack(from: $0) }
         self.initiative = p.initiative
@@ -750,7 +826,7 @@ nonisolated struct NetworkPlayerState: Codable, Equatable, Sendable {
 }
 
 nonisolated struct NetworkMonsterState: Codable, Equatable, Sendable {
-    let id: UUID
+    let id: String
     let name: String
     let currentHP: Int
     let maxHP: Int
@@ -759,20 +835,31 @@ nonisolated struct NetworkMonsterState: Codable, Equatable, Sendable {
     let actions: [NetworkAttack]
     let initiative: Double
 
+    init(id: String, name: String, currentHP: Int, maxHP: Int, abilityScores: NetworkAbilityScores, status: [NetworkStatusCondition]?, actions: [NetworkAttack], initiative: Double) {
+        self.id = id
+        self.name = name
+        self.currentHP = currentHP
+        self.maxHP = maxHP
+        self.abilityScores = abilityScores
+        self.status = status
+        self.actions = actions
+        self.initiative = initiative
+    }
+
     init(from m: Monster) {
-        self.id = m.id
+        self.id = m.id.uuidString
         self.name = m.name
         self.currentHP = m.currentHP
         self.maxHP = m.maxHP
         self.abilityScores = NetworkAbilityScores(from: m.abilityScores)
-        self.status = m.status?.map { NetworkStatusCondition(from: $0) }
+        self.status = m.status.map { $0.map { NetworkStatusCondition(from: $0) } }
         self.actions = m.actions.map { NetworkAttack(from: $0) }
         self.initiative = m.initiative
     }
 }
 
 nonisolated struct NetworkNPCState: Codable, Equatable, Sendable {
-    let id: UUID
+    let id: String
     let name: String
     let currentHP: Int
     let maxHP: Int
@@ -782,13 +869,25 @@ nonisolated struct NetworkNPCState: Codable, Equatable, Sendable {
     let actions: [NetworkAttack]
     let initiative: Double
 
+    init(id: String, name: String, currentHP: Int, maxHP: Int, abilityScores: NetworkAbilityScores, status: [NetworkStatusCondition]?, spellSlots: [NetworkSpellSlot], actions: [NetworkAttack], initiative: Double) {
+        self.id = id
+        self.name = name
+        self.currentHP = currentHP
+        self.maxHP = maxHP
+        self.abilityScores = abilityScores
+        self.status = status
+        self.spellSlots = spellSlots
+        self.actions = actions
+        self.initiative = initiative
+    }
+
     init(from n: NPC) {
-        self.id = n.id
+        self.id = n.id.uuidString
         self.name = n.name
         self.currentHP = n.currentHP
         self.maxHP = n.maxHP
         self.abilityScores = NetworkAbilityScores(from: n.abilityScores)
-        self.status = n.status?.map { NetworkStatusCondition(from: $0) }
+        self.status = n.status.map { $0.map { NetworkStatusCondition(from: $0) } }
         self.spellSlots = n.spellSlots.map { NetworkSpellSlot(from: $0) }
         self.actions = n.actions.map { NetworkAttack(from: $0) }
         self.initiative = n.initiative

@@ -61,6 +61,7 @@ final class CampaignNetworkingService {
     @ObservationIgnored private var deltaLog: [CampaignDelta] = []
     @ObservationIgnored private let maxDeltaLogCount = 500
     @ObservationIgnored private var commandReceipts: [UUID: [UUID: CampaignCommandResult]] = [:]
+    @ObservationIgnored private let maxCommandReceiptsPerClient = 1000
     @ObservationIgnored private var connectedPeerName: String?
 
     // Callbacks
@@ -316,17 +317,36 @@ final class CampaignNetworkingService {
         var clientReceipts = commandReceipts[clientID] ?? [:]
         clientReceipts[commandID] = CampaignCommandResult(accepted: receipt, rejected: nil)
         commandReceipts[clientID] = clientReceipts
+        evictOldestReceipts(for: clientID)
     }
 
     func recordRejectedReceipt(_ rejection: CampaignCommandRejected, for clientID: UUID, commandID: UUID) {
         var clientReceipts = commandReceipts[clientID] ?? [:]
         clientReceipts[commandID] = CampaignCommandResult(accepted: nil, rejected: rejection)
         commandReceipts[clientID] = clientReceipts
+        evictOldestReceipts(for: clientID)
+    }
+
+    private func evictOldestReceipts(for clientID: UUID) {
+        guard var clientReceipts = commandReceipts[clientID],
+              clientReceipts.count > maxCommandReceiptsPerClient else { return }
+        let excess = clientReceipts.count - maxCommandReceiptsPerClient
+        let keysToRemove = Array(clientReceipts.keys.prefix(excess))
+        for key in keysToRemove {
+            clientReceipts.removeValue(forKey: key)
+        }
+        commandReceipts[clientID] = clientReceipts
     }
 
     func receipt(for clientID: UUID, commandID: UUID) -> CampaignCommandResult? {
         commandReceipts[clientID]?[commandID]
     }
+
+    #if DEBUG
+    func receiptsForTesting(clientID: UUID) -> [UUID: CampaignCommandResult] {
+        commandReceipts[clientID] ?? [:]
+    }
+    #endif
 
     func replayBatch(from lastAppliedRevision: Int) -> CampaignDeltaBatch? {
         let nextRevision = lastAppliedRevision + 1

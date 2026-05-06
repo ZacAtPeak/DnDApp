@@ -102,7 +102,9 @@ final class CampaignDataService {
             creatureType: player.race,
             spellSlots: player.spellSlots.normalizedToLevel9(),
             speed: player.speed,
-            sourceSidebarID: sidebarID
+            sourceSidebarID: sidebarID,
+            sourceEntityID: player.id,
+            sourceEntityType: .player
         )
     }
 
@@ -117,7 +119,9 @@ final class CampaignDataService {
             creatureType: monster.type.rawValue,
             spellSlots: monster.spellSlots.normalizedToLevel9(),
             speed: monster.speed,
-            sourceSidebarID: sidebarID
+            sourceSidebarID: sidebarID,
+            sourceEntityID: monster.id,
+            sourceEntityType: .monster
         )
     }
 
@@ -132,7 +136,9 @@ final class CampaignDataService {
             creatureType: "Humanoid",
             spellSlots: npc.spellSlots.normalizedToLevel9(),
             speed: npc.speed,
-            sourceSidebarID: sidebarID
+            sourceSidebarID: sidebarID,
+            sourceEntityID: npc.id,
+            sourceEntityType: .npc
         )
     }
 }
